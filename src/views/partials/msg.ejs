@@ -1,0 +1,55 @@
+
+
+
+<% if (sucesso_msg != "" ) { %>
+
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <%= sucesso_msg %>
+     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+   </div>    
+
+     <% } %>
+
+  <% if (erro_msg != "") { %>
+
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <%= erro_msg %>
+       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+     </div>
+    
+  <% } %>
+<!-- 
+  <% if (erro_msg != "") { %>
+    <div class="alert alert-danger" role="alert">
+      <%= erro_msg %>
+    </div>
+  <% } else { %>
+    <div class="alert alert-success" role="alert">
+      Nenhum erro encontrado.
+    </div>
+  <% } %>
+   -->
+
+   <% if (sucesso_msg_login != "" ) { %>
+
+    <div class="alert alert-success" role="alert">
+      <%= sucesso_msg_login %>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+     </div>
+     
+  
+       <% } %>
+  
+    <% if (erro_msg_login != "") { %>
+  
+      <div class="alert alert-danger" role="alert">
+        <%= erro_msg_login %>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+       </div>
+      
+      
+    <% } %>

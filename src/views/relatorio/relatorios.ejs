@@ -1,0 +1,153 @@
+<%- include('../partials/header.ejs') %>
+
+
+    <p class="fs-3">Tela de Relatorios </p>
+    <%- include('../partials/msg.ejs') %>
+
+        <!-- declaração de vareáveis  -->
+        <% let somaValorCompra=0; %>
+            <% let somaValorVenda=0; %>
+                <% let lucro=0; %>
+
+                    <div class="row">
+                        <label for="data_entrega"><strong>Filtrar vendas por
+                                período.</strong></label>
+                        <form action="/relatorio/buscar" method="post" class="w-100">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-auto">
+                                    <label for="inputPassword6" class="col-form-label">Dada inicial:</label>                                </div>
+                                <div class="col-auto">
+                                    <input name="data_inicial" type="date" class="form-control form-control-sm"
+                                        value="<%= moment().format('YYYY-MM-DD') %>">
+                                </div>
+                                <div class="col-auto">
+                                    <label for="inputPassword6" class="col-form-label">Data final:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input name="data_final" type="date" class="form-control form-control-sm"
+                                        value="<%= moment().add(1, 'day').format('YYYY-MM-DD') %>">
+                                </div>
+                                <div class="col-auto">
+                                    <label for="inputPassword6" class="col-form-label">Forma de pagamento:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <select name="form_pagamento" class="form-select form-select-sm" aria-label="Default select example">
+                                        <option selected></option>
+                                        <option value="Dinheiro">Dinheiro</option>
+                                        <option value="PIX">PIX</option>
+                                        <option value="Débito">Cartão de Débito</option>
+                                        <option value="Crédito">Cartão de Crédito</option>
+                                        <option value="Cautela">Cautela</option>
+                                    </select>
+                                </div>
+                                
+
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary btn-sm" data-toggle="modal"
+                                        data-target="#myModal">Buscar
+                                    </button>
+                                </div>
+                        </form>
+                    </div>
+                    </br>
+                    </br>
+
+
+
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Vendas por período
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Gráfico de vendas por categoria -->
+                                            <% if ( typeof valorTotalVendasPeriodo !=='undefined' &&
+                                                valorTotalVendasPeriodo !==null && valorTotalVendasPeriodo !=='' ) { %>
+                                                <%= valorTotalVendasPeriodo.toLocaleString('pt-BR', { style: 'currency'
+                                                    , currency: 'BRL' }) %>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <% vendas.forEach(venda=> { %>
+                                        <!-- <% somaValorVenda +=venda.valor_total_venda %> -->
+                                            <% }); %>
+                                                <!-- inicio forEach item -->
+                                                <% item_pedido.forEach(item=> { %>
+                                                    <!-- <% somaValorCompra +=item.valor_compra %> -->
+                                                        <% }); %>
+                                                            <div class="card">
+                                                                <div class="card-header">
+                                                                    <!-- <% lucro=somaValorVenda - somaValorCompra %> -->
+                                                                        Lucro por período:
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <!-- Tabela de produtos mais vendidos -->
+                                                                    <% if ( typeof valorTotalVendasPeriodo
+                                                                        !=='undefined' && valorTotalVendasPeriodo
+                                                                        !==null && valorTotalVendasPeriodo !=='' ) { %>
+
+                                                                        <%= lucro_total.toLocaleString('pt-BR', {
+                                                                            style: 'currency' , currency: 'BRL' }) %>
+
+                                                                            <% } %>
+                                                                </div>
+                                                            </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="row mt-4">
+
+                                <div class="col-md-6">    
+                                    <% const totalPorTipoPagamento = {}; %>
+                                    
+                                    <% vendas.forEach(venda => { %>
+                                        <% if (!totalPorTipoPagamento[venda.tipo_pagamento]) { %>
+                                            <% totalPorTipoPagamento[venda.tipo_pagamento] = 0; %>
+                                        <% } %>
+                                        <% totalPorTipoPagamento[venda.tipo_pagamento] += venda.valor_total_venda; %>
+                                    <% }); %>
+                                    
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Resumo de Vendas
+                                        </div>
+                                        <div class="card-body">
+                                            <% if ( typeof valorTotalVendasPeriodo
+                                    !=='undefined' && valorTotalVendasPeriodo
+                                    !==null && valorTotalVendasPeriodo !=='' ) { %>
+
+                                            <% for (const tipoPagamento in totalPorTipoPagamento) { %>
+                                                <p><strong><%= tipoPagamento %>:</strong> <%= totalPorTipoPagamento[tipoPagamento].toLocaleString('pt-BR', {
+                                                    style: 'currency' , currency: 'BRL' }) %></p>
+                                            <% } %>
+
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+
+                    <%- include('../partials/footer.ejs') %>

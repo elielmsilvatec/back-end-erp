@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- <link rel="shortcut icon" href="/img/png/icon.png" type="image/x-icon"
+    class="img-fluid rounded-circle"> -->
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3700/3700776.png" type="image/x-icon">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela de Login</title>
+  <!-- Bibliotecas do Bootstrap -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <!-- CSS personalizado -->
+
+
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h5 class="card-title text-center">Tela de Login</h5>
+
+            <%- include('../partials/msg.ejs') %>
+              <form class="form-signin" action="/user/login" method="post">
+                <div class="form-label-group">
+                  <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email" required
+                    autofocus>
+                  <label for="inputEmail">Email</label>
+                </div>
+                <div class="form-label-group">
+                  <input name="senha" type="password" id="inputPassword" class="form-control" placeholder="Senha"
+                    required>
+                  <label for="inputPassword">Senha</label>
+                </div>
+                <div class="custom-control custom-checkbox mb-3">
+                  <input type="checkbox" class="custom-control-input" id="customCheck1">
+                  <label class="custom-control-label" for="customCheck1">Lembrar minha senha</label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Entrar</button>
+                <hr class="my-4">
+                <!--<button class="btn btn-lg btn-google btn-block text-uppercase" type="submit"><i class="fab fa-google mr-2"></i>Entrar com o Google</button>
+              <button class="btn btn-lg btn-facebook btn-block text-uppercase" type="submit"><i class="fab fa-facebook-f mr-2"></i>Entrar com o Facebook</button>  -->
+                <a class="btn btn-lg btn-secondary btn-block text-uppercase" href="#" data-toggle="modal"
+                  data-target="#recuperarSenhaModal">Esqueci minha senha</a>
+                <a class="btn btn-lg btn-secondary btn-block text-uppercase" href="#" data-toggle="modal"
+                  data-target="#cadastrarModal">Cadastre-se</a>             
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de recuperação de senha -->
+  <div class="modal fade" id="recuperarSenhaModal" tabindex="-1" role="dialog"
+    aria-labelledby="recuperarSenhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="recuperarSenhaModalLabel">Recuperar senha</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="/user/recuperar-senha">
+            <div class="form-group">
+              <label for="email">Endereço de e-mail:</label>
+              <input name="email" type="email" class="form-control" id="email" placeholder="Digite seu e-mail">
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de cadastro -->
+  <div class="modal fade" id="cadastrarModal" tabindex="-1" role="dialog" aria-labelledby="cadastrarModalLabel"
+    aria-hidden="true">
+    <form method="post" action="/user/new">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cadastrarModalLabel">Cadastre-se</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- Aqui vão os campos do formulário de cadastro -->
+
+            <div class="form-group">
+              <label for="nomeCadastro">Nome</label>
+              <input name="nome" type="text" class="form-control" id="nomeCadastro" placeholder="Digite seu nome">
+            </div>
+            <div class="form-group">
+              <label for="emailCadastro">E-mail</label>
+              <input name="email" type="email" class="form-control" id="emailCadastro" placeholder="Digite seu e-mail">
+            </div>
+            <div class="form-group">
+              <label for="senhaCadastro">Senha</label>
+              <input name="senha" type="password" class="form-control" id="senhaCadastro"
+                placeholder="Digite sua senha">
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+
+
+
+  <style>
+    body {
+      background-color: #1c2331;
+      padding-top: 100px;
+    }
+  </style>

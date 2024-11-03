@@ -1,0 +1,227 @@
+<%- include('../partials/header.ejs') %>
+
+
+    <p class="fs-3">Tela de produtos</p>
+    <%- include('../partials/msg.ejs') %>
+       
+
+            <div class="row">
+                <div class="col d-flex justify-content-between">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"> 
+                        <i class="bi bi-plus-square-dotted">   </i>
+                        Cadastrar
+                        produto</button>
+        
+                    <form action="/produto/estoque_baixo" method="get">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="bi bi-eye"> </i>Visualizar produtos com estoque baixo</button>
+                    </form>
+                
+                </div>
+            </div>
+
+        <!-- Botão buscar -->
+        <br>
+        <form action="/produto/produtos" method="POST">
+            <!-- <label for="search-input"></label> -->
+            <div class="input-group">
+                <input name="busca" type="text" class="form-control" id="search-input"
+                    placeholder="Digite o nome do produto">
+                <div class="input-group-append">
+                	<button type="submit" class="btn btn-outline-primary" style="margin-left: 10px;">
+                        <i class="bi bi-search"></i> Buscar 
+                    </button>
+                </div>
+            </div>
+        </form>
+
+
+        <!-- Modal de Adicionar Novo -->
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="/produtos/save">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Cadastro de Produto</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="nomeProduto" class="form-label">Nome do Produto:</label>
+                                <input name="nomeProduto" type="text" class="form-control" id="nomeProduto" required
+                                    autofocus="on">
+                            </div>
+                            <div class="mb-3">
+                                <label for="marca" class="form-label">Marca:</label>
+                                <input name="marca" type="text" class="form-control" id="marca" required
+                                    />
+                            </div>
+                            <div class="mb-3">
+                                <label for="unidadeMedida" class="form-label">Unidade de Medida:</label>
+                                <select name="unidadeMedida" class="form-control" id="unidadeMedida">
+                                    <option value="Unidade">Unidade</option>
+                                    <option value="kg">kg</option>                                  
+                                    <option value="Metro">Metro</option>
+                                    <option value="Litro">Litro</option>
+                                    <option value="Milheiro">Milheiro</option>
+                                    <option value="Pacote">Pacote</option>
+                                    <option value="Saco">Saco</option>
+                                    <option value="duzia">Dúzia</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="quantidadeEstoque" class="form-label">Quantidade em Estoque:</label>
+                                <input name="quantidadeEstoque" type="text" class="form-control" id="quantidadeEstoque"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="valorCompra" class="form-label">Valor de Compra:</label>
+                                <input name="valorCompra" type="text" class="form-control" id="valorCompra" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="valorVenda" class="form-label">Valor de Venda:</label>
+                                <input name="valorVenda" type="text" class="form-control" id="valorVenda" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="observacoes" class="form-label">Observações:</label>
+                                <textarea name="observacoes" class="form-control" rows="5" id="observacoes"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <br>
+        <!--Lista (tabela) de todos os produtos-->
+        <table class="table table-hover table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nome</th>
+                    <th class="text-center align-middle">Medida</th>
+                    <th class="text-center align-middle">Marca</th>
+                    <th class="text-center align-middle">Quantidade</th>
+                    <th class="text-center align-middle">Valor</th>
+                    <th class="text-center align-middle">Visualizar</th>
+                </tr>
+            </thead>
+            <!-- Inicio do forEach-->
+            <% produtos.forEach(prod=>{ %>
+                <tbody>
+                    <tr>
+                        <td data-toggle="modal" class="align-middle">
+                            <%= prod.nomeProduto %>
+                        </td>
+                        <td class="text-center align-middle">
+                            <%= prod.unidadeMedida %>
+                        </td>
+                        <td class="text-center align-middle">
+                            <%= prod.marca %>
+                        </td>
+                      
+                        <td class="text-center align-middle">
+                            <%= prod.quantidadeEstoque %>
+                        </td>
+                        <td class="text-center align-middle">
+                            <%= prod.valorVenda.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+                        </td>
+                        <th class="text-center align-middle">                        
+                            <a href="/produtos/edit/<%= prod.id %>">
+                                <!-- <img src="/img/list.png" style="width: 35px; height: 28px;"> -->
+                                <!-- <button class="button is-normal is-link is-inverted is-rounded">Detalhes</button> -->
+                                <!-- <button type="button" class="btn btn btn-outline-light btn-rounded ">Detalhes</button> -->
+                                <button class=" btn_branco"> Abrir
+                                </button>
+                    
+                            </a>
+                        </th>
+
+
+                    </tr>
+
+                </tbody>
+                <!-- fim do forEach-->
+                <% }) %>
+        </table>
+
+
+
+        <style>
+            .center {
+                text-align: center;
+            }
+        </style>
+
+        <script>
+            function Alerta() {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                })
+
+                swalWithBootstrapButtons.fire({
+                    title: 'Tem certeza?',
+                    text: "Você não será capaz de reverter isso!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, deletar este item!',
+                    cancelButtonText: 'Não, cancelar!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalWithBootstrapButtons.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        )
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                            'Cancelled',
+                            'Your imaginary file is safe :)',
+                            'error'
+                        )
+                    }
+                })
+            }
+
+
+        </script>
+        <%- include('../partials/footer.ejs') %>
+
+
+
+
+
+
+
+
+            <!--     Listando todos os produtos 
+    <% produtos.forEach(prod =>{   %>
+        <p>      <%= prod.id %>    </p>
+   <%  }) %>
+
+
+
+<td>R$  prod.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })</td>
+
+Neste exemplo, a função toLocaleString() recebe dois parâmetros: 'pt-BR' para definir a localidade 
+como português brasileiro, e um objeto de opções que especifica que o estilo de formatação 
+deve ser de moeda (style: 'currency') e a moeda a ser usada é o real brasileiro (currency: 'BRL').
+
+
+
+     -->

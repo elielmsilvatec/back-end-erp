@@ -1,0 +1,145 @@
+<%- include('../partials/header.ejs') %>
+	<p class="fs-3">Tela de cliente</p>
+	<%- include('../partials/msg.ejs') %>
+
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+			<i class="bi bi-plus-square-dotted">   </i>Novo cliente</button>
+		
+			
+		<form action="/cliente/buscar" method="POST" id="formCliente">
+			<label for="search-input"></label>
+			<div class="input-group">
+				<input name="busca" type="text" class="form-control" id="search-input"
+					placeholder="Digite o nome do cliente">
+				<div class="input-group-append">
+					<button type="submit" class="btn btn-outline-primary" style="margin-left: 10px;">
+						<i class="bi bi-search"> </i>  Buscar 
+					</button>
+				</div>
+			</div>
+		</form>
+
+		<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+			<form method="post" action="/cliente/save">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title" id="myModalLabel">Cadastro de Cliente</h4>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="nome">Nome:</label>
+								<input name="nome" type="text" class="form-control" id="nome"
+									placeholder="Digite o nome do cliente" required autofocus>
+							</div>
+							<div class="form-group">
+								<label for="telefone">Telefone:</label>
+								<input name="telefone" type="text" class="form-control" id="telefone"
+									placeholder="(00) 0000-0000" required>
+							</div>
+							<div class="form-group">
+								<label for="cep">CEP:</label>
+								<input name="cep" type="text" class="form-control" id="cep" placeholder="00000 - 000">
+							</div>
+							<div class="form-group">
+								<label for="rua">Rua:</label>
+								<input name="rua" type="text" class="form-control" id="rua"
+									placeholder="Digite a rua do cliente">
+							</div>
+							<div class="form-group">
+								<label for="numero">Número:</label>
+								<input name="numero" type="text" class="form-control" id="numero"
+									placeholder="Digite o número do cliente" value="0">
+							</div>
+							<div class="form-group">
+								<label for="bairro">Bairro:</label>
+								<input name="bairro" type="text" class="form-control" id="bairro"
+									placeholder="Digite o bairro do cliente">
+							</div>
+							<div class="form-group">
+								<label for="cidade">Cidade:</label>
+								<input name="cidade" type="text" class="form-control" id="cidade"
+									placeholder="Digite a cidade do cliente">
+							</div>
+							<div class="form-group">
+								<label for="observacoes">Observações:</label>
+								<textarea name="observacoes" class="form-control" id="observacoes"
+									placeholder="Digite as observações sobre o cliente"></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+							<button type="submit" class="btn btn-primary">Salvar</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<br>
+
+		<table class="table table-hover table-bordered">
+			<thead class="thead-light">
+				<tr>
+					<th>Nome</th>
+					<th class="center">Telefone</th>
+					<th>Rua</th>
+					<th>Bairro</th>
+					<th>Cidade</th>
+					<th class="text-center align-middle">Visualizar</th>
+				</tr>
+			</thead>
+			<% clientes.forEach(function (client) { %>
+				<tbody>
+					<tr>
+						<td data-toggle="modal" class="align-middle">
+							<%= client.nome %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= client.telefone %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= client.rua %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= client.bairro %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= client.cidade %>
+						</td>
+
+						<th class="text-center align-middle">
+							<a href="/cliente/editar/<%= client.id %>">
+								<!-- <img src="/img/avanco-rapido.gif" style="width: 30px; height: 30px;"> -->
+								<button class=" btn_branco"> Abrir
+                                </button>
+							</a>
+						</th>
+					</tr>
+				</tbody>
+				<% }) %>
+		</table>
+
+
+
+
+
+		<!-- Adicione o código abaixo para aplicar a máscara ao campo de telefone -->
+		<script>
+			$(document).ready(function () {
+				$('#telefone').mask('(00) 0000-0000');
+			});
+
+			$(document).ready(function () {
+				$('#cep').mask('00000 - 000');
+			});
+
+
+
+
+		</script>
+
+
+
+		<%- include('../partials/footer.ejs') %>

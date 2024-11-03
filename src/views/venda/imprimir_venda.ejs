@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Impressão</title>
+  <style>
+    @media print {
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 80mm;
+        margin: 0 auto;
+        padding: 10px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .content {
+        margin-bottom: 10px;
+      }
+      .footer {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Detalhes do Pedido</h2>
+    </div>
+    <div class="content">
+      <% if (typeof cliente !== 'undefined' && cliente !== null && cliente !== '') { %>
+        <h4>Informações do Cliente:</h4>
+        <p>
+          <strong>Nome:</strong> <%= cliente.nome %><br>
+          <strong>Telefone:</strong> <%= cliente.telefone %><br>
+          <strong>Rua:</strong> <%= cliente.rua %><br>
+          <strong>Número:</strong> <%= cliente.numero %><br>
+          <strong>CEP:</strong> <%= cliente.cep %><br>
+          <strong>Bairro:</strong> <%= cliente.bairro %><br>
+          <strong>Cidade:</strong> <%= cliente.cidade %><br>
+          <strong>Observações:</strong> <%= cliente.observacoes %>
+        </p>
+      <% } %>
+      <% if (typeof itemPedido !== 'undefined') { %>
+        <h4>Produtos:</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th> Medida</th>
+              <th>Quantidade</th>
+              <th>Valor</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% itemPedido.forEach(item => { %>
+              <tr>
+                <td><%= item.nome %></td>
+                <td><%= item.undMedidas %></td>
+                <td><%= item.quant_itens %></td>
+                <td> <%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2
+                }); %></td>
+                <td><%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' ,
+                  currency: 'BRL' }) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+    <div class="footer">
+      <p>Total da compra: <strong><%= venda.valor_total_venda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></strong></p>
+    </div>
+
+
+      <button onclick="imprimirTela()" type="button" class="btn btn-secondary">Imprimir</button>
+      <script>
+        function imprimirTela() {
+          window.print();
+        }
+      </script>
+      </div>
+</body>
+</html>

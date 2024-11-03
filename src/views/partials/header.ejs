@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ConstruERP</title>
+    <!-- <link rel="shortcut icon" href="/img/png/icon.png" type="image/x-icon" class="img-fluid rounded-circle"> -->
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3700/3700776.png" type="image/x-icon">
+
+    <!-- Isso que faz a responsividade funcionar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Importação do Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+        <!-- IMPORTANDO A BIBLIOTECA Bulma -->
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"> -->
+
+    <!-- Bibliotecas de ícones -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Fontes do Google -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Font1|Font2|Font3">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
+
+    <!-- Alertas SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css">
+
+
+    <!-- Importação do seu CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <script type="text/javascript" src="/script/script.js"></script>
+</head>
+
+
+
+<body>
+    <!-- Barra de navegação móvel (para telas menores) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light menu_mobile">
+        <div class="container">
+            <h4 class="logoText">ConstruERP</h4>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                onclick="mostrarFormMobile()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"> home</i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/produto/produtos"><i class="fas fa-shopping-cart"></i> Produtos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cliente/clientes"><i class="fas fa-users"></i> Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pedido/pedidos"><i class="fas fa-clipboard-list"></i> Pedidos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/venda/vendas"><i class="fas fa-money-bill-wave"></i> Vendas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/entrega/entregas"><i class="fas fa-envelope"></i> Entregas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/relatorio/relatorios"><i class="fas fa-envelope"></i> Relatórios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/financeiro/contas"><i class="fas fa-envelope"></i> Controle financeiro</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+
+                    <% if (typeof user !=='undefined' ) { %>
+                        <li class="nav-item">                        
+                            <a href="/user/perfil">    <%- include('../partials/user_session.ejs')%></a>
+                        </li>
+                        <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu principal (para telas maiores) -->
+    <div class="content">
+        <div class="menu">
+            <br>
+            <div class="logo">
+                <!-- <img src="https://cdn-icons-png.flaticon.com/512/313/313066.png?w=826&t=st=1682176031~exp=1682176631~hmac=d7f5af49186523205148472ec71b2b3deafabb339ec74ce56d840e7cd79625cc"
+                    alt="logo"> -->
+                    <img src="/img/icon/perfil3.jpeg" alt="logo" style="border-radius: 50%; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+
+                <h4 class="logoText">ConstruERP</h4>
+            </div>
+            <ul>
+
+                <li id="home"><a href="/"><i class="bi bi-house-door"></i></i> Home </a></li>
+                <li id="produtos"><a href="/produto/produtos"><i class="bi bi-box-seam"></i> Produtos</a></li>
+                <li id="clientes"><a href="/cliente/clientes"><i class="bi bi-people"></i> Clientes</a></li>
+                <li id="pedidos"><a href="/pedido/pedidos"><i class="bi bi-cart-check"></i> Pedidos</a></li>
+                <li id="vendas"><a href="/venda/vendas"> <i class="bi bi-credit-card"></i> Vendas</a></li>
+                <li id="entrega"><a href="/entrega/entregas"><i class="bi bi-truck"></i> Entregas</a></li>
+                <li id="relatorio"><a href="/relatorio/relatorios"><i class="bi bi-clipboard-data"></i> Relatórios</a></li>
+                <li id="financeiro"><a href="/financeiro/contas"><i class="bi bi-credit-card"></i> Financeiro </a></li>
+                <li><a href="/user/logout"> <i class="bi bi-arrow-return-right"></i>Sair</a></li>
+
+                <% if (typeof user !=='undefined' ) { %>
+                    <li"><a href="/user/perfil"><%- include('../partials/user_session.ejs') %></a></a></li>
+                        <% } %>
+
+                       
+                   
+                    
+            </ul>
+        </div>

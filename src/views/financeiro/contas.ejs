@@ -1,0 +1,393 @@
+<%- include('../partials/header.ejs') %>
+	<p class="fs-3">Controle Financeiro</p>
+	<%- include('../partials/msg.ejs') %>
+		<% let soma_contas=0; %>
+			<!-- Botão que abre o modal -->
+			<div class="row">
+				<div class="col d-flex justify-content-between">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal_add">
+						<i class="bi bi-plus-square-dotted"> </i> Cadastrar contas a pagar
+					</button>
+
+					<a href="/financeiro/todas" class="list-group-item  ">Visualizar todas pendentes</a>
+				</div>
+			</div>
+
+
+			</br>
+			<!-- campo de pesquisa por data -->
+			<div class="row">
+
+				<form action="/contas/pesquisar" method="post" class="w-100">
+					<div class="row g-3 align-items-center">
+						<div class="col-auto">
+							<label for="inputPassword6" class="col-form-label">Pesquisar por mês de vencimento:</label>
+						</div>
+
+
+						<div class="col-auto">
+							<select name="mes_ano" class="form-select form-select-sm"
+								aria-label="Default select example">
+								<% for (var i=11; i>= -11; i--) { %>
+									<% var month=moment().subtract(i, 'months' ); %>
+										<option value="<%= month.format('M-YYYY') %>" <% if (i===0) { %>selected<% } %>>
+												<%= month.format('MMMM YYYY') %>
+										</option>
+										<% } %>
+							</select>
+						</div>
+
+
+						<div class="col-auto">
+							<button type="submit" class="btn btn-primary btn-sm" data-toggle="modal"
+								data-target="#myModal">Buscar
+							</button>
+						</div>
+				</form>
+			</div>
+			</br>
+
+
+
+			<!-- Container para o modal -->
+			<div class="modal fade" id="Modal_add" tabindex="-1" aria-labelledby="Modal_addLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="Modal_addLabel">Cadastrar nova conta a ser paga</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form method="post" action="/financeiro/contas/add">
+								<div class="mb-3">
+									<label for="nome" class="form-label">Descrição</label>
+									<input type="text" class="form-control" id="nome" name="nome">
+								</div>
+								<div class="mb-3">
+									<label for="valor" class="form-label">Valor</label>
+									<input type="number" step="0.01" class="form-control" id="valor" name="valor">
+								</div>
+								<div class="mb-3">
+									<label for="dataVencimento" class="form-label">Data de vencimento</label>
+									<input type="date" class="form-control" id="dataVencimento" name="vencimento">
+								</div>
+								<div class="mb-3">
+									<input type="checkbox" id="parcelado" name="parcelado" value="parcelado">
+									<label for="parcelado">Conta parcelada</label>
+									<div id="parcelas" style="display: none;">
+										<label for="quantidadeParcelas">Quantidade de parcelas</label>
+										<input type="number" class="form-control" id="quantidadeParcelas"
+											name="quantidadeParcelas">
+									</div>
+								</div>
+								<div class="mb-3">
+									<div id="div_recorrente">
+										<input type="checkbox" id="recorrente" name="recorrente" value="recorrente">
+										<label for="recorrente">Pagamento recorrente</label>
+									</div>
+								</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" class="btn btn-primary">Salvar</button>
+							</>
+						</div>
+					</div>
+				</div>
+			</div>
+			</BR>
+
+
+
+			<div class="accordion accordion-flush" id="accordionFlushExample">
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="flush-headingThree">
+						<button class="accordion-button collapsed" type="button" aria-expanded="false"
+							aria-controls="flush-collapseThree" onclick="toggleAccordion('flush-collapseThree')">
+							Contas do mês
+						</button>
+					</h2>
+					<div id="flush-collapseThree" class="accordion-collapse collapse show"
+						aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+						<div class="accordion-body">
+							<table class="table table-hover table-bordered">
+								<thead class="thead-light">
+									<tr>
+										<th>Descrição</th>
+										<th>Recorrente</th>
+										<th>Vencimento</th>
+										<th>Valor</th>
+										<th>Status</th>
+										<th class="text-center align-middle">Visualizar</th>
+									</tr>
+								</thead>
+								<% controle.forEach(function (contas) { %>
+									<% soma_contas=soma_contas + contas.valor %>
+										<tbody>
+											<tr>
+												<td data-toggle="modal" class="align-middle">
+													<%= contas.nome %>
+												</td>
+												<td data-toggle="modal" class="align-middle">
+													<% if(contas.recorrente === true){ %>
+														Conta recorrente
+													<% } %>
+												</td>
+												<td data-toggle="modal" class="align-middle text-center">
+													<% if(contas.recorrente===true) { %>
+														<%= moment.utc(contas.vencimento).format('DD') %>
+															<% } else { %>
+																<%= moment.utc(contas.vencimento).format('DD/MM/YYYY')
+																	%>
+																	<% } %>
+												</td>
+												<td data-toggle="modal" class="align-middle">
+													<%= contas.valor.toLocaleString('pt-BR', { style: 'currency' ,
+														currency: 'BRL' }) %>
+												</td>
+												<td data-toggle="modal" class="align-middle text-center">
+													<%= contas.obs %>
+												</td>
+												<th class="text-center align-middle">
+													<a href="/financeiro/ver/<%= contas.id %>">
+														<button type="button" class="btn_branco">
+															<i class="bi bi-eye"> </i>Visualizar</button>
+													</a>
+												</th>
+											</tr>
+										</tbody>
+										<% }) %>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div style="text-align:right">
+				<!-- Acesso à somaTotal fora do loop forEach -->
+				<p>Soma de todas as contas:
+					<strong>
+						<%= soma_contas.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+					</strong>
+
+					<p>Recebido:
+					
+						<strong>
+							<%= soma_contas.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+						</strong>
+
+						<p>Saldo:
+							<strong>
+								<%= soma_contas.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+							</strong>
+
+				</p>
+			</div>
+
+			<!--  mostra e oculta barra de contas -->
+			<script>
+				function toggleAccordion(accordionId) {
+					const accordion = document.getElementById(accordionId);
+					const button = accordion.previousElementSibling.querySelector('.accordion-button');
+
+					// Verifica se o acordeão está expandido ou recolhido
+					const isExpanded = accordion.classList.contains('show');
+
+					// Alterna entre os estados expandido e recolhido
+					if (isExpanded) {
+						accordion.classList.remove('show');
+						button.setAttribute('aria-expanded', 'false');
+					} else {
+						accordion.classList.add('show');
+						button.setAttribute('aria-expanded', 'true');
+					}
+				}
+			</script>
+
+
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
+					const parceladoCheckbox = document.getElementById('parcelado');
+					const parcelasCheckbox = document.getElementById('parcelas');
+					const quantidadeParcelas = document.getElementById('quantidadeParcelas');
+					const recorrenteCheckbox = document.getElementById('recorrente');
+					const div_recorrente = document.getElementById('div_recorrente');
+
+					// Esconde o input de quantidade de parcelas e mostra o checkbox de pagamento recorrente quando a página é carregada
+					quantidadeParcelas.style.display = 'none';
+					recorrenteCheckbox.style.display = 'block';
+
+					// Adiciona um listener para o evento de mudança no checkbox de conta parcelada
+					parceladoCheckbox.addEventListener('change', function () {
+						if (parceladoCheckbox.checked) {
+							// Mostra o input de quantidade de parcelas e esconde o checkbox de pagamento recorrente quando o checkbox de conta parcelada é marcado
+							quantidadeParcelas.style.display = 'block';
+							parcelasCheckbox.style.display = 'block';
+							recorrenteCheckbox.style.display = 'block';
+							quantidadeParcelas.value = ''; // Limpa o valor do input de quantidade de parcelas
+							recorrenteCheckbox.checked = false;
+							div_recorrente.style.display = 'none';
+						} else {
+							// Mostra o checkbox de pagamento recorrente e esconde o input de quantidade de parcelas quando o checkbox de conta parcelada é desmarcado
+							quantidadeParcelas.style.display = 'none';
+							recorrenteCheckbox.style.display = 'block';
+							parcelasCheckbox.style.display = 'none';
+							parceladoCheckbox.checked = false; // Desmarca o checkbox de parcelado
+							quantidadeParcelas.value = '';
+							div_recorrente.style.display = 'block';
+						}
+					});
+				});
+			</script>
+
+
+
+
+
+
+
+
+			<!-- 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+		<table class="table table-hover table-bordered">
+			<thead class="thead-light">
+				<tr>
+					<th>Descrição</th>
+					<th>Recorrente</th>
+					<th>Vencimento</th>
+					<th>Valor</th>
+					<th>Status</th>
+					<th class="text-center align-middle">Visualizar</th>
+				</tr>
+			</thead>
+			<% controle.forEach(function (contas) { %>
+				<tbody>
+					<tr>
+						<td data-toggle="modal" class="align-middle" >
+							<%= contas.nome %>
+							<input type="text" name="nome" id="<%= contas.nome %>" value="<%= contas.nome %>">
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= contas.recorrente %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<% if(contas.recorrente===true) { %>
+								<%= moment.utc(contas.vencimento).format('DD') %>
+									<% } else { %>
+										<%= moment.utc(contas.vencimento).format('DD/MM/YYYY') %>
+											<% } %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= contas.valor.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
+						</td>
+						<td data-toggle="modal" class="align-middle">
+							<%= contas.status %>
+
+						</td>
+						<th class="text-center align-middle">
+							<a href="/financeiro/ver/<%= contas.id %>">
+								<button type="button" class="btn btn-outline-success btn-sm">
+									<i class="bi bi-eye"> </i>Visualizar</button>
+							</a>
+						</th>
+
+						<td>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+								data-bs-target="#Modal_editar" data-account-id="<%= contas.id %>">
+								<i class="bi bi-plus-square-dotted"> </i> Editar essa conta
+							</button>
+				
+						</td>
+
+					</tr>
+				</tbody>
+				<% }) %>
+		</table>
+
+
+
+		<script>
+			$('#Modal_editar').on('show.bs.modal', function (event) {
+				var button = $(event.relatedTarget);
+				var accountId = button.data('account-id');
+				console.log(accountId);
+				// Agora, você precisará recuperar as informações da conta com base no ID, 
+				// seja fazendo uma requisição AJAX ou buscando nas informações que você já tem.
+
+				// Exemplo de como poderia ser feita uma requisição AJAX (usando jQuery):
+				console.log('Enviando requisição para /financeiro/editar/' + accountId);
+
+				$.ajax({
+					url: '/financeiro/editar/' + accountId,
+					method: 'GET',
+					success: function (accountData) {
+						console.log('Resposta da requisição:', accountData);
+						// Continue com o código para popular os campos do modal
+					},
+					error: function (error) {
+						console.error('Erro ao obter informações da conta:', error);
+					}
+				});
+
+			});
+
+
+		</script>
+
+
+
+		<!-- Container para o modal  
+		<div class="modal fade" id="Modal_editar" tabindex="-1" aria-labelledby="Modal_editarLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="Modal_editarLabel">Editar</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form method="post" action="/financeiro/contas/add">
+							<div class="mb-3">
+								<label for="nome" class="form-label">Descrição</label>
+								<input type="text" class="form-control" id="nome" name="nome">
+							</div>
+							<div class="mb-3">
+								<label for="valor" class="form-label">Valor</label>
+								<input type="number" step="0.01" class="form-control" id="valor" name="valor">
+							</div>
+							<div class="mb-3">
+								<label for="dataVencimento" class="form-label">Data de vencimento</label>
+								<input type="date" class="form-control" id="dataVencimento" name="vencimento">
+							</div>
+							<div class="mb-3">
+								<input type="checkbox" id="parcelado" name="parcelado" value="parcelado">
+								<label for="parcelado">Conta parcelada</label>
+								<div id="parcelas" style="display: none;">
+									<label for="quantidadeParcelas">Quantidade de parcelas</label>
+									<input type="number" class="form-control" id="quantidadeParcelas"
+										name="quantidadeParcelas">
+								</div>
+							</div>
+							<div class="mb-3">
+								<div id="div_recorrente">
+									<input type="checkbox" id="recorrente" name="recorrente" value="recorrente">
+									<label for="recorrente">Pagamento recorrente</label>
+								</div>
+							</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-primary">Salvar</button>
+						</>
+					</div>
+				</div>
+			</div>
+		</div> -->
+
+			<%- include('../partials/footer.ejs') %>

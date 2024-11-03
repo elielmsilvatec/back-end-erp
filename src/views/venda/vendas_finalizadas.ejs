@@ -1,0 +1,112 @@
+<%- include('../partials/header.ejs') %>
+
+
+    <%- include('../partials/msg.ejs') %>
+
+
+    <p class="fs-3">Vendas finalizadas</p>
+
+        <!-- Filtrar por periodo -->
+        <div class="row">      
+
+                    <div class="row">
+                        <div class="col d-flex justify-content-between">                         
+                            <label for="data_entrega"><strong>Filtrar vendas por
+                                período.</strong></label>
+
+                            <form action="/venda/vendas_finalizadas" method="post">                             
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                               	<i class="bi bi-eye"> </i> Visualizar vendas canceladas  </button>
+                            </form>
+                        </div>
+                    </div>
+
+
+               
+            <form action="/venda/vendas_finalizadas/buscar" method="post" class="w-100">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="inputPassword6" class="col-form-label">Dada inicial:</label>
+                    </div>
+                    <div class="col-auto">
+                       <input name="data_inicial" type="date" class="form-control form-control-sm" value="<%= moment.utc().format('YYYY-MM-DD') %>">
+                    </div>
+                    <div class="col-auto">
+                        <label for="inputPassword6" class="col-form-label">Data final:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input name="data_final" type="date"  class="form-control form-control-sm"
+                            value="<%= moment.utc().add(1, 'day').format('YYYY-MM-DD') %>">
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Buscar
+                        </button>
+                    </div>
+            </form>
+        </div>
+
+        <br><br>
+
+        <table class="table table-hover table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Pagamento</th>
+                    <th>Data da venda</th>
+                    <th>Valor</th>
+                    <th class="text-center align-middle">Detalhes</th>
+                </tr>
+            </thead>
+            <!-- lista todos as vendas  -->
+            <% venda_finalizada.forEach(venda=> { %>
+                <!-- lista todos os itens -->
+                <% pedido.forEach(pedido=> { %>
+                    <!-- verifica se a venda pertence ao id pedido -->
+                    <% if( pedido.id==venda.id_pedido && pedido.status==3 ) { %>
+
+                        <tbody>
+                            <tr>
+                                <td data-toggle="modal">
+                                    <%= pedido.num_pedido %>
+                                </td>
+                                <td>
+                                    <% cliente.forEach(cliente=> { %>
+                                        <% if( pedido.cliente_pedido==cliente.id ) { %>
+                                            <%= cliente.nome %>
+                                                <% } %>
+                                                    <% }); %>
+                                </td>
+                                <td>
+                                    <%= venda.tipo_pagamento %>
+                                </td>
+                                <td>
+                                    <!-- data sem fusorário moment.utc -->
+                                    <%= moment.utc(venda.data_venda).format('DD/MM/YYYY') %>
+                                </td>
+                                <td>
+                                    <%= venda.valor_total_venda.toLocaleString('pt-BR', { style: 'currency' ,
+                                        currency: 'BRL' }) %> %>
+                                </td>
+
+                                <td class="text-center align-middle">
+                                    <a href="/venda/ver/ <%= pedido.id %>">
+                                        <button type="button" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-eye"> </i>Visualizar</button>
+                                    </a>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                        <% } %>
+
+                            <% }); %>
+
+                                <% }); %>
+        </table>
+
+
+
+        <%- include('../partials/footer.ejs') %>

@@ -1,0 +1,172 @@
+<%- include('../partials/header.ejs') %>
+
+
+    <p class="fs-3">Tela de pedidos</p>
+
+    <%- include('../partials/msg.ejs') %>
+       
+        <div class="row">
+            <div class="col d-flex justify-content-between">
+                <form action="/pedido/add_novo" method="post">
+                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                        <i class="bi bi-plus-square-dotted">  </i>Novo
+                        pedido</button>
+                </form>
+    
+                <form action="/pedido/pedidos_fechados" method="get">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi bi-eye"> </i>Visualizar pedidos finalizados.</button>
+                </form>
+            </div>
+        </div>
+    
+        <!-- Botão buscar -->
+     
+        <!-- <form action="" method="POST" class="d-flex">
+            <div class="form-group">
+                <label for="search-input">Pesquisar:</label>
+                <input name="busca" type="text" class="form-control ml-2" id="search-input"
+                    placeholder="Digite o nome do produto e precione Enter">
+            </div>
+
+        </form> -->
+
+        <br>
+        <!-- Modal de Adicionar Novo -->
+
+        <!-- Modal Editando os produtos -->
+        <div class="modal fade" id="myModal_Editar" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <!-- Formulário está enviando os dados para a rota  action=" " usando o método method="post", com a função do botão type="submit" -->
+                    <form method="post" action="/produtos/save">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Editar Produto</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nomeProduto">Nome do Produto:</label>
+                                <input name="nomeProduto" type="text" class="form-control" id="nomeProduto" required
+                                    autofocus='on'>
+                            </div>
+                            <div class="form-group">
+                                <label for="unidadeMedida">Unidade de Medida:</label>
+                                <select name="unidadeMedida" class="form-control" id="unidadeMedida">
+                                    <option value="kg">kg</option>
+                                    <option value="Unidade">Unidade</option>
+                                    <option value="Metro">Metro</option>
+                                    <option value="Litro">Litro</option>
+                                    <option value="Milheiro">Milheiro</option>
+                                    <option value="Pacote">Pacote</option>
+                                    <option value="Saco">Saco</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="quantidadeEstoque">Quantidade em Estoque:</label>
+                                <input name="quantidadeEstoque" type="number" class="form-control"
+                                    id="quantidadeEstoque" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="valorCompra">Valor de Compra:</label>
+                                <input name="valorCompra" type="number" class="form-control" id="valorCompra" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="valorVenda">Valor de Venda:</label>
+                                <input name="valorVenda" type="number" class="form-control" id="valorVenda" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="observacoes">Observações:</label>
+                                <textarea name="observacoes" class="form-control" rows="5" id="observacoes"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!--Lista (tabela) de todos os pedidos-->
+        <table class="table table-hover table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Valor</th>
+                    <th class="text-center align-middle">Detalhes</th>
+                </tr>
+            </thead>
+            <% pedidos.forEach(pedido=> { %>
+                <tbody>
+                    <tr>
+                        <td data-toggle="modal" class="align-middle">
+                            <%= pedido.num_pedido %>
+                        </td>
+                        <td data-toggle="modal" class="align-middle">
+                            <% const client=cliente.find(c=> c.id === pedido.cliente_pedido); %>
+                                <% if (client) { %>
+                                    <%= client.nome %>
+                                        <% }else{ %>
+                                            consumidor final
+                                            <% } %>
+                        </td>
+                        <td data-toggle="modal" class="align-middle">
+                            <% if (pedido.status===1) { %>
+                                Aberto
+                                <% } %>
+                                    <% if (pedido.status===2) { %>
+                                        Fechado
+                                        <% } %>
+                                            <% if (pedido.status===3) { %>
+                                                Venda Finalizada
+                                                <% } %>
+                        </td>
+                        <td data-toggle="modal" class="align-middle">
+                            <%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL'
+                                }) %>
+                        </td>
+                        <td class="text-center align-middle">
+                            <a href="/pedido/ver/<%= pedido.id %>">
+                                <!-- <img src="/img/avanco-rapido.gif" style="width: 30px; height: 30px;"> -->
+                                <button class=" btn_branco"> Abrir
+                                </button>
+                            </a>
+                            <!-- <a href="/pedido/delet/<%= pedido.id %>">
+                                <button type="button" class="btn btn-danger btn-sm">
+                                   Deletar
+                                </button>
+                            </a> -->
+                        </td>
+                    </tr>
+                </tbody>
+                <% }) %>
+        </table>
+
+
+
+        <style>
+            .center {
+                text-align: center;
+            }
+        </style>
+
+       
+
+
+
+
+
+
+
+
+
+
+        <%- include('../partials/footer.ejs') %>

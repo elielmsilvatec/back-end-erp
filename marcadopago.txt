@@ -1,0 +1,19 @@
+
+user id
+200819317
+
+Número da aplicação
+6906161268836363
+
+Integração com
+CheckoutPro
+
+Modelo de integração
+Marketplace
+
+
+Public Key
+TEST-f62f6428-fd4b-4501-ba3f-b5b21f835b0a
+
+Access Token
+TEST-6906161268836363-011121-32e87d55ddcfae3033993decf21e5799-200819317

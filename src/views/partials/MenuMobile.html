@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Meu App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        header {
+            background-color: #3d4b65;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 20px;
+            display: none;
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu li {
+            margin: 0 10px;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: #3d4b65;
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .menu li {
+                margin: 10px 0;
+            }
+
+            .menu-icon {
+                display: block;
+            }
+        }
+    </style>
+     <script>
+        const menuIcon = document.querySelector(".menu-icon");
+        const menu = document.querySelector(".menu");
+
+        menuIcon.addEventListener("click", () => {
+            menu.classList.toggle("show");
+        });
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h1>Meu App</h1>
+        </div>
+        <nav>
+            <div class="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="menu">
+                <li><a href="#">Opção 1</a></li>
+                <li><a href="#">Opção 2</a></li>
+                <li><a href="#">Opção 3</a></li>
+                <li><a href="#">Opção 4</a></li>
+                <li><a href="#">Opção 5</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h2>Bem-vindo ao Meu App!</h2>
+        <p>Este é um exemplo de página com um menu responsivo para dispositivos móveis.</p>
+    </div>
+
+   

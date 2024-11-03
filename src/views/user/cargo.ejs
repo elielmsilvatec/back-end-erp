@@ -1,0 +1,53 @@
+<%- include('../partials/header.ejs') %>
+    <%- include('../partials/msg.ejs') %>
+
+        <body style="background-color: #f8f9fa;">
+            <div class="container mt-5">
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <!-- Informações do Usuário -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Digite sua senha para ter acesso adimistrativo</h5>
+                                <form class="form-signin" action="/user/cargo/login" method="post">
+                                    <input type="email" name="email" value="<%= user.email %>" style="display: none;">
+                                    <div class="form-label-group">
+                                        <p class="card-text">
+                                            <%= user.email %>
+                                        </p>
+                                    </div>
+   
+                                    <div class="form-group">
+                                        <label for="form_cargo">Selecione seu cargo:</label>
+                                        <select name="form_cargo" class="form-control" id="form_cargo"
+                                            onchange="mostrarParcelas()" required>
+                                            <option value="vendedor">Vendedor</option>
+                                            <option value="administrador">Administrador</option>
+
+                                        </select>
+                                    </div>
+
+                                    <label for="inputPassword"></label>
+                                    <input name="senha" type="password" id="inputPassword" class="form-control"
+                                        placeholder="Digite sua senha" required>
+                            </div>
+                            <br />
+                            <button class="btn  btn-primary btn-block text-uppercase" type="submit">Enviar</button>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            </div>
+
+
+
+
+
+            <%- include('../partials/footer.ejs') %>

@@ -1,0 +1,415 @@
+<%- include('../partials/header.ejs') %>
+
+    <p class="fs-3">Pedido de número 
+        <%= pedido.num_pedido %>
+    </p>
+
+    <% if (sucesso_msg !="" ) { %>
+
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= sucesso_msg %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <% } %>
+
+            <% if (erro_msg !="" ) { %>
+
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= erro_msg %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <% } %>
+
+                    <% let somaTotal=0; %>
+
+
+                        <div class="d-flex justify-content-between">
+                            <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
+                                <h4>
+                                    <form action="/pedido/delet/cliente" method="POST">
+                                        <%= cliente.nome %>
+                                            <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                style="display:none ;">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm confirm-delete">
+                                                <i class="bi bi-trash"></i></button>
+                                    </form>
+                                </h4>
+                                <%}else {%>
+
+                                    <!-- botão adicionar cliente mostra o formulario -->
+                                    <div>
+                                        <button class="btn btn-outline-primary" onclick="mostrarForm()">
+                                            <i class="bi bi-person-plus-fill"> </i>Adicionar
+                                            	cliente</button>
+                                    </div>
+                                    <%}%>    
+                        </div>
+
+
+                        <form action="/pedido/buscar/cliente" method="POST" id="formCliente" style="display: none;">
+                            <input name="id_pedido" type="number" value="<%= pedido.id %>" style="display: none;">
+                            <label for="search-input">Pesquisar cliente</label>
+                            <div class="input-group">
+                                <input name="busca" type="text" class="form-control" id="search-input"
+                                    placeholder="Digite o nome do cliente">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-outline-primary" style="margin-left: 10px;">
+                                        <span class="bi bi-person"></span> Buscar cliente
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <form action="/pedido/buscar/produto" method="POST" id="formProduto">
+                            <input name="id_pedido" type="number" value="<%= pedido.id %>" style="display:none;">
+                            <label for="search-input">Pesquisar produto:</label>
+                            <div class="input-group">
+                                <input name="busca" type="text" class="form-control" id="search-input"
+                                    placeholder="Digite o nome do produto">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary" style="margin-left: 10px;">
+                                        <span class="bi bi-box"></span> Buscar produto
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <br>
+                        <!-- Selecionar produtos -->
+                        <% if (typeof produtos !=='undefined' ) { %>
+                            <table class="table table-hover table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th class="text-center align-middle">Medida</th>
+                                        <th class="text-center align-middle">Marca</th>
+                                        <th class="text-center align-middle">Quantidade estoque</th>
+                                        <th>Valor unitário</th>
+                                        <th class="text-center align-middle">Detalhes</th>
+                                    </tr>
+                                </thead>
+                                <!-- Inicio do forEach-->
+                                <% produtos.forEach(prod=> { %>
+                                    <tbody>
+                                        <tr>
+                                            <td data-toggle="modal" class="align-middle">
+                                                <%= prod.id %>
+                                            </td>
+                                            <td data-toggle="modal" class="align-middle">
+                                                <%= prod.nomeProduto %>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <%= prod.unidadeMedida %>
+                                            </td>
+
+                                            <td class="text-center align-middle">
+                                                <%= prod.marca %>
+                                            </td>
+
+                                            <td class="text-center align-middle">
+                                                <%= prod.quantidadeEstoque %>
+                                            </td>
+                                     
+                                            <td data-toggle="modal" class="align-middle">
+                                                <%= prod.valorVenda.toLocaleString('pt-BR', { style: 'currency' ,
+                                                    currency: 'BRL' }) %>
+
+                                            </td>
+                                            <th class="text-center align-middle">
+                                                <!-- formulario adicionar produto ao pedido -->
+                                                <form action="/pedido/add/produto_item" method="post">
+                                                    <!--inicio do formulario inserindo produto-->
+                                                    <input name="nome" type="text" value="<%= prod.nomeProduto %>"
+                                                        style="display:none;" />
+                                                    <input name="undMedidas" type="text"
+                                                        value="<%= prod.unidadeMedida %>" style="display:none;" />
+                                                        <input name="marca" type="text"
+                                                        value="<%= prod.marca %>" style="display:none;" />
+                                                    <input type="text" name="sub_total_itens"
+                                                        value="<%= prod.valorVenda %>" class="meu-input"
+                                                        style="display:none;">
+                                                    <input type="text" name="valor_compra"
+                                                        value="<%= prod.valorCompra %>" class="meu-input"
+                                                        style="display:none;">
+                                                    <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                        style="display:none;" />
+                                                    <input name="itens_produto" type="number" value="<%= prod.id %>"
+                                                        style="display:none;" />
+                                                    <button type="submit" class="btn btn-outline-success btn-sm">
+                                                        <i class="bi bi-cart-check"></i> Adicionar produto</button>
+                                                </form> <!--fim do formulario-->
+                                            </th>
+
+
+
+                                        </tr>
+                                    </tbody>
+                                    <% }) %>
+                            </table>
+                            <% } %>
+
+                                <!-- Selecionar cliente -->
+                                <% if (typeof clientes !=='undefined' ) { %>
+                                    <table class="table table-hover table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th class="text-center align-middle">Telefone</th>
+                                                <th class="text-center align-middle">Rua</th>
+                                                <th class="text-center align-middle">Bairro</th>
+                                                <th class="text-center align-middle">Cidade</th>
+                                                <th class="text-center align-middle">Detalhes</th>
+                                            </tr>
+                                        </thead>
+                                        <!-- Inicio do forEach-->
+                                        <% clientes.forEach(client=> { %>
+                                            <tbody>
+                                                <tr>
+                                                    <td data-toggle="modal" class="align-middle">
+                                                        <%= client.nome %>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <%= client.telefone %>
+                                                    </td>
+
+                                                    <td class="text-center align-middle">
+                                                        <%= client.rua %>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <%= client.bairro %>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <%= client.cidade %>
+                                                    </td>
+                                                    <th class="text-center align-middle">
+                                                        <form action="/pedido/cliente/add_novo" method="post"
+                                                            class="d-inline-block mr-2">
+                                                            <!--inicio do formulario inserindo produto-->
+                                                            <input name="id_cliente" type="text"
+                                                                value="<%= client.id %>" style="display:none;" />
+                                                            <input name="id_pedido" type="number"
+                                                                value="<%= pedido.id %>" style="display:none;" />
+                                                            <button type="submit" class="btn btn-success">Adicionar
+                                                                cliente</button>
+                                                        </form> <!--fim do formulario-->
+
+                                                    </th>
+
+                                                </tr>
+                                            </tbody>
+                                            <% }) %>
+                                    </table>
+                                    <% } %>
+
+
+
+                                        <!-- lista de produtos / editando quantidades -->
+                                        <% if (typeof itemPedido !=='undefined' ) { %>
+                                            <table class="table table-hover table-bordered">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Nome</th>
+                                                        <th class="text-center align-middle">Medida</th>
+                                                        <th class="text-center align-middle">Marca</th>
+                                                        <th class="text-center align-middle">Quantidade</th>
+                                                        <th class="text-center align-middle">Valor</th>
+                                                        <th class="text-center align-middle">Total</th>
+                                                        <th class="text-center align-middle">Excluir</th>
+                                                    </tr>
+                                                </thead>
+                                                <!-- Inicio do forEach-->
+                                                <% itemPedido.forEach(item=> { %>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td data-toggle="modal" class=" align-middle">
+                                                                <%= item.produtoID %>
+                                                            </td>
+                                                            <td data-toggle="modal" class=" align-middle">
+                                                                <%= item.nome %>
+                                                            </td>
+                                                            <td class="text-center align-middle">
+                                                                <%= item.undMedidas %>
+                                                            </td>
+                                                            <td class="text-center align-middle">
+                                                                <%= item.marca %>
+                                                            </td>
+                                                            <!-- --------------formulário quantidade----------------------------------------------------------------------------------------: -->
+                                                            <td class="center input">
+                                                                <form action="/pedido/editar/quant" method="POST">
+                                                                    <input name="IDpedido" type="number"
+                                                                        value="<%= pedido.id %>"
+                                                                        style="display:none;" />
+                                                                    <input name="id" type="number"
+                                                                        value="<%= item.id %>" style="display:none;" />
+                                                                    <input type="text" name="valor_unitario"
+                                                                        value="<%= item.valor_unitario %>"
+                                                                        class="meu-input" style="display:none;" />
+                                                                    <input type="text" name="valor_compra"
+                                                                        value="<%= item.valor_compra %>"
+                                                                        class="meu-input" style="display: none;" />
+
+                                                                    <input type="text" name="quant"
+                                                                        value="<%= item.quant_itens %>"
+                                                                        class="meu-input" />
+                                                                    <button type="submit"
+                                                                        style="display:none;"></button>
+                                                                </form>
+                                                            </td>
+                                                            <!-- <i class="fas fa-edit" onclick="habilitarInputs()"></i> -->
+
+                                                            <!-- ------------------------------------------------------------------------------------------------------: -->
+                                                            <!-- Editando valor unitário -->
+                                                            <td class="center input">
+                                                                <form action="/pedido/editar/valor_unitario"
+                                                                    method="POST">
+                                                                    <input name="IDpedido" type="number"
+                                                                        value="<%= pedido.id %>"
+                                                                        style="display:none;" />
+                                                                    <input name="id" type="number"
+                                                                        value="<%= item.id %>" style="display:none;" />
+
+                                                                    <input type="text" name="valor_unitario"
+                                                                        id="valor_unitario" value="<%= item.valor_unitario.toLocaleString('pt-BR', {
+                                                                minimumFractionDigits: 2 }); %>" class="meu-input" />
+
+                                                                    <button type="submit"
+                                                                        style="display:none;"></button>
+                                                                </form>
+                                                            </td>
+                                                            <!-- ------------------------------------------------------------------------------------------------------: -->
+
+                                                            </form>
+
+                                                            <td class="text-center align-middle">
+                                                                <%= item.sub_total_itens.toLocaleString('pt-BR', {
+                                                                    style: 'currency' , currency: 'BRL' }) %>
+                                                            </td>
+                                                            <td class="text-center align-middle">
+                                                                <!-- Deletando item do pedido -->
+                                                                <form action="/pedido/delet/item" method="POST">
+                                                                    <input name="IDpedido" type="number"
+                                                                        value="<%= pedido.id %>"
+                                                                        style="display:none;" />
+                                                                    <input name="id" type="number"
+                                                                        value="<%= item.id %>" style="display:none;" />
+                                                                    <button type="submit"
+                                                                        class="btn btn-outline- btn-sm confirm-delete">
+                                                                        <i class="bi bi-backspace"></i></button>
+                                                                </form>
+                                                            </td>
+
+                                                            </th>
+                                                        </tr>
+                                                    </tbody>
+                                                    <% }) %> <!--fim do loop itens-->
+
+                                                        <!-- somando os valores -->
+                                                        <% let somaItem=0; %>
+
+                                                            <% itemPedido.forEach((item)=> { %>
+                                                                <% somaItem +=item.sub_total_itens; %>
+
+                                                                    <!-- Exibição do valor do item -->
+
+                                                                    <% }) %>
+
+                                                                        <% somaTotal +=somaItem; %>
+
+                                            </table>
+
+                                            <div style="text-align:right">
+                                                <!-- Acesso à somaTotal fora do loop forEach -->
+                                                <p>Soma total dos produtos:
+                                                    <strong>
+                                                        <%= somaTotal.toLocaleString('pt-BR', { style: 'currency' ,
+                                                            currency: 'BRL' }) %>
+                                                    </strong>
+                                                    <% } %> <!--fim do if pra verificar se há itens-->
+                                                </p>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col d-flex justify-content-between">
+                                                    <form action="/pedido/delet/<%= pedido.id %>" method="get">
+                                                        <button type="submit"
+                                                            class="btn btn-danger confirm-delete">
+                                                            <i class="bi bi-trash"> </i>Deletar</button>
+                                                        <% if(somaTotal> 0 ){ %>
+                                                    </form>
+                                                    <form action="/pedido/finalizar/item" method="post">
+                                                        <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                            style="display:none;">
+
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="bi bi-cart-check"> </i>Finalizar
+                                                            pedido</button>
+                                                    </form>
+                                                    <%} %>
+                                                </div>
+                                            </div>
+
+
+
+                                            <style>
+                                                .id {
+                                                    display: none;
+                                                }
+
+                                                .center {
+                                                    text-align: center;
+                                                    padding: 5px;
+                                                }
+
+                                                .meu-input {
+                                                    /* Adicione estilos aqui */
+                                                    width: 100px;
+                                                    padding: 5px;
+                                                    border: 1px solid #ccc;
+                                                    border-radius: 5px;
+                                                    text-align: center;
+                                                }
+                                            </style>
+
+                                            <!-- Script para habilitar os inputs -->
+                                            <script>
+                                                function mostrarForm() {
+                                                    const formCliente = document.querySelector('#formCliente');
+                                                    const formProduto = document.querySelector('#formProduto');
+
+                                                    // Verifica se o elemento está visível ou oculto
+                                                    if (formCliente.style.display === 'none') {
+                                                        // Se estiver oculto, exibe o elemento
+                                                        formCliente.style.display = 'block';
+                                                    } else {
+                                                        // Se estiver visível, oculta o elemento
+                                                        formCliente.style.display = 'none';
+                                                    }
+
+                                                    // Verifica se o elemento está visível ou oculto
+                                                    if (formProduto.style.display === 'none') {
+                                                        // Se estiver oculto, exibe o elemento
+                                                        formProduto.style.display = 'block';
+                                                    } else {
+                                                        // Se estiver visível, oculta o elemento
+                                                        formProduto.style.display = 'none';
+                                                    }
+                                                }
+
+                                            </script>
+                                            <script>  // confirmar antes de deletar -> envia para o script.js (SweetAlert2)
+                                                const deleteButtons = document.querySelectorAll('.confirm-delete');
+                                                deleteButtons.forEach(button => {
+                                                    button.addEventListener('click', function (event) {
+                                                        event.preventDefault();
+                                                        AlertaClass(this.form);
+                                                    });
+                                                });
+                                            </script>
+
+
+                                            <%- include('../partials/footer.ejs') %>

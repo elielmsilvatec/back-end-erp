@@ -1,0 +1,242 @@
+<%- include('../partials/header.ejs') %>
+
+
+
+
+    <div class="row">
+        <div class="col d-flex justify-content-between">
+            <p class="fs-3">Vendas finalizada</p>
+
+            <% if ( venda.fechado !==2 ) { %>
+                <form action="">
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalCancelamento">
+                        <i class="bi bi-trash"> </i>Cancelar venda
+                    </button>
+                </form>
+                <%}%>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalCancelamento" tabindex="-1" aria-labelledby="modalCancelamentoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCancelamentoLabel">Motivo do cancelamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCancelamento" action="/vendas/deletar/<%= venda.id %>" method="post">
+                        <div class="mb-3">
+                            <label for="motivoCancelamento" class="form-label">Informe o motivo do cancelamento:</label>
+                            <textarea name="obs" class="form-control" id="motivoCancelamento" rows="3"></textarea>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="text" name="id_pedido" value="<%= pedido.id %>" class="none">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-danger" onclick="enviarFormulario()">Enviar</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+    <script>
+        function enviarFormulario() {
+            var motivo = document.getElementById("motivoCancelamento").value;
+            if (motivo.trim() === "") {
+                alert("Por favor, informe o motivo do cancelamento.");
+                return;
+            }
+            // Aqui você pode adicionar a lógica para enviar o formulário
+            document.getElementById("formCancelamento").submit();
+        }
+    </script>
+
+
+    <%- include('../partials/msg.ejs') %>
+        <% let somaTotal=0; %>
+
+
+            <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
+
+
+                <h6>
+                    <strong>Nome:</strong>
+                    <%= cliente.nome %> <br>
+                        <strong>Telefone:</strong>
+                        <%= cliente.telefone %><br>
+                            <strong>Rua:</strong>
+                            <%= cliente.rua %>
+                                <strong style="margin-left: 20px;">Número:</strong>
+                                <%= cliente.numero %> <br>
+                                    <strong>CEP:</strong>
+                                    <%= cliente.cep %>
+                                        <strong style="margin-left: 20px;">Bairro:</strong>
+                                        <%= cliente.bairro %>
+                                            <strong style="margin-left: 20px;">Cidade:</strong>
+                                            <%= cliente.cidade %> <br>
+                                                <strong>Observações:</strong>
+                                                <%= cliente.observacoes %>
+                </h6>
+
+                <%}%>
+
+
+
+
+                    <!-- lista de produtos / editando quantidades -->
+                    <% if (typeof itemPedido !=='undefined' ) { %>
+                        <table class="table table-hover table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="center">und Medida</th>
+                                    <th class="center">Quantidade</th>
+                                    <th class="center">Valor</th>
+                                    <th class="center">Total</th>
+                                </tr>
+                            </thead>
+                            <!-- Inicio do forEach-->
+                            <% itemPedido.forEach(item=> { %>
+                                <tbody>
+                                    <tr>
+                                        <td data-toggle="modal">
+                                            <%= item.nome %>
+                                        </td>
+                                        <td class="center">
+                                            <%= item.undMedidas %>
+                                        </td>
+                                        <td class="center input">
+                                            <%= item.quant_itens %>
+                                        </td>
+                                        <td class="center">
+                                            <%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2
+                                                }); %>
+                                        </td>
+
+                                        </form>
+
+                                        <td class="center">
+                                            <%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' ,
+                                                currency: 'BRL' }) %>
+                                        </td>
+
+
+                                        </th>
+                                    </tr>
+                                </tbody>
+                                <% }) %> <!--fim do loop itens-->
+
+
+
+                        </table>
+                        <div class="text-right">
+                         <% if( venda.desconto) {%>
+                            <p>Desconto: <strong>
+                                    <%= venda.desconto.toLocaleString('pt-BR', { style: 'currency' ,
+                                        currency: 'BRL' }) %>
+                                </strong>
+                            </p>
+                         <%}%>
+                         <% if( venda.taxas) {%>
+                            <p>Taxas: <strong>
+                                    <%= venda.taxas.toLocaleString('pt-BR', { style: 'currency' ,
+                                        currency: 'BRL' }) %>
+                                </strong>
+                            </p>
+                         <%}%>
+                        </div>
+
+                        <div class="text-right">
+                            <!-- Acesso à somaTotal fora do loop forEach -->
+                            <p>Total da compra: <strong>
+                                    <%= venda.valor_total_venda.toLocaleString('pt-BR', { style: 'currency' ,
+                                        currency: 'BRL' }) %>
+                                </strong>
+                            </p>
+                            <% } %> <!--fim do if pra verificar se há itens-->
+                        </div>
+
+                        <div class="form-group" id="dataEntregaDiv">
+                            <label for="data_entrega">Data da entrega: </label>
+                            <strong>
+                                <%= moment.utc(venda.data_entrega).format('DD/MM/YYYY') %>
+                            </strong>
+                        </div>
+                        <div class="form-group" id="dataEntregaDiv">
+                            <label for="data_entrega">Observações: </label>
+                            <strong>
+                                <%= venda.obs %>
+                            </strong>
+
+                        </div>
+                        <br>
+
+
+
+                        <script>  // confirmar antes de confirmar -> envia para o script.js (SweetAlert2)
+                            const deleteButtons = document.querySelectorAll('.confirm');
+                            deleteButtons.forEach(button => {
+                                button.addEventListener('click', function (event) {
+                                    event.preventDefault();
+                                    Confirm(this.form);
+                                });
+                            });
+                        </script>
+
+                        <style>
+                            .cliente {
+                                margin-right: 30px;
+                            }
+
+                            .id {
+                                display: none;
+                            }
+
+                            .center {
+                                text-align: center;
+                                padding: 5px;
+                            }
+
+                            .meu-input {
+                                /* Adicione estilos aqui */
+                                width: 100px;
+                                padding: 5px;
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                text-align: center;
+                            }
+
+                            td {
+
+                                align-items: center;
+
+                            }
+                        </style>
+
+                        <!-- Script para habilitar os inputs -->
+
+
+
+                        <!-- Botão para abrir o modal -->
+                        <a href="/venda/imprimir/<%= pedido.id %>" target="_blank">
+                            <button id="Botao_imprimir" type="button" class="btn btn-primary btn-sm"> Visualização de
+                                Impressão
+                            </button>
+                        </a>
+
+                        <script>
+                            document.getElementById('Botao_imprimir').addEventListener('click', function (event) {
+                                event.stopPropagation();
+                            });
+                        </script>
+
+
+
+
+
+                        <%- include('../partials/footer.ejs') %>
