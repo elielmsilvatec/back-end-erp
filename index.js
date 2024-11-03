@@ -25,11 +25,17 @@ const ControleFinanceiroController = require("./src/Controller/ControleFinanceir
 
 const cors = require('cors');
 // Configurar CORS
+const allowedOrigins = ['http://localhost:3000', 'https://front-end-erp-production.up.railway.app'];
+
 app.use(cors({
-    // origin: 'http://localhost:3000',  // Endereço do React app
-    // credentials: true
-    origin: '*', // Permitir qualquer origem
-    credentials: true, // Permitir credenciais, ajuste conforme necessário
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
 }));
 
 const cookieParser = require('cookie-parser'); // Adicione esta linha

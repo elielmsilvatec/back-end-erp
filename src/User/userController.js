@@ -8,6 +8,7 @@ const Auth = require("../auth");
 const nodemailer = require("nodemailer");
 
 const jwt = require("jsonwebtoken"); // Adiciona jsonwebtoken
+const { has } = require("browser-sync");
 const secret = "kakdhkasjdkhajkdhkajsdhjkshdjkahskdh";
 
 // ler
@@ -100,6 +101,7 @@ router.post("/user/new", async (req, res) => {
           email: email,
           senha: hash,
         }).then(() => {
+
           return res
             .status(200)
             .json({ message: "Cadastrado com sucesso. Faça login!" });
