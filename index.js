@@ -38,6 +38,13 @@ app.use(cors({
     credentials: true,
 }));
 
+// app.use(cors({
+//     // origin: 'http://localhost:3000',  // Endereço do React app
+//     // credentials: true
+//     origin: '*', // Permitir qualquer origem
+//     credentials: true, // Permitir credenciais, ajuste conforme necessário
+// }));
+
 const cookieParser = require('cookie-parser'); // Adicione esta linha
 
 app.use(cookieParser()); // Adicione esta linha para usar o cookie-parser

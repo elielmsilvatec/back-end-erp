@@ -5,11 +5,22 @@ const User = require("../User/userController");
 const { Op } = require("sequelize");
 const Auth = require("../auth");
 
-// ler
-router.get("/produto/produtos", Auth, async (req, res) => {
+
+router.get('/produto/listar', async (req, res) => {
+  const user = req.headers['user']; // Captura o header 'User-Name'
+
+  if (!user) {
+    return res.status(400).json({ message: 'Usuario não autenticado' });
+  }
+
+  // Aqui você pode usar o userName para filtrar ou buscar dados específicos
+  console.log(`Usuario autenticado: ${user}`);
+
+
+
   try {
     const produtos = await Produto.findAll({
-      where: { usuario: req.session.user.id },
+      where: { usuario: user },
       limit: 100,
     });
 
@@ -20,7 +31,27 @@ router.get("/produto/produtos", Auth, async (req, res) => {
     console.error("Erro ao buscar produtos:", error);
     return res.status(500).json({ error: "Erro ao buscar produtos" });
   }
+
+
 });
+
+
+// ler
+// router.get("/produto/produtos", Auth, async (req, res) => {
+//   try {
+//     const produtos = await Produto.findAll({
+//       where: { usuario: req.session.user.id },
+//       limit: 100,
+//     });
+
+//     // console.log('Produtos encontrados:', produtos);
+
+//     return res.status(200).json({ produtos });
+//   } catch (error) {
+//     console.error("Erro ao buscar produtos:", error);
+//     return res.status(500).json({ error: "Erro ao buscar produtos" });
+//   }
+// });
 
 // ler estoque baixo
 router.get("/produto/estoque_baixo", Auth, async (req, res) => {
