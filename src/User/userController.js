@@ -31,6 +31,7 @@ router.get("/session-info", (req, res) => {
   }
 });
 
+
 // login
 router.post("/user/login", async (req, res) => {
   var email = req.body.email;
@@ -46,13 +47,24 @@ router.post("/user/login", async (req, res) => {
       if (user != undefined) {
         var correct = bcrypt.compareSync(senha, user.senha);
         if (correct) {
+          // Gerar o JWT
+          // const token = jwt.sign(
+          //   { id: user.id, nome: user.nome, email: user.email, cargo: "vendedor" },
+          //   secret,
+          //   { expiresIn: '2d' } // Define o tempo de expiração do token (1 hora nesse caso)
+          // );
+
           req.session.user = {
             id: user.id,
             nome: user.nome,
             email: user.email,
             cargo: "vendedor",
           };
-          return res.status(200).json({ message: "Login bem-sucedido" , user :   req.session.user });
+
+
+          // Retornar o token no corpo da resposta
+          // return res.status(200).json({ message: "Login bem-sucedido", token, user: req.session.user });
+          return res.status(200).json({ message: "Login bem-sucedido",  user: req.session.user });
           //res.json(req.session.user)
         } else {
           return res.json({
@@ -77,6 +89,55 @@ router.post("/user/login", async (req, res) => {
       });
   }
 });
+
+
+
+// // login
+// router.post("/user/login", async (req, res) => {
+//   var email = req.body.email;
+//   var senha = req.body.senha;
+
+//   try {
+//     if (!email || email.trim() === "") {
+//       req.flash("erro_msg_login", "Email ou senha incorretos...!");
+//       return res.redirect("login");
+//     }
+
+//     User.findOne({ where: { email: email } }).then((user) => {
+//       if (user != undefined) {
+//         var correct = bcrypt.compareSync(senha, user.senha);
+//         if (correct) {
+//           req.session.user = {
+//             id: user.id,
+//             nome: user.nome,
+//             email: user.email,
+//             cargo: "vendedor",
+//           };
+//           return res.status(200).json({ message: "Login bem-sucedido" , user :   req.session.user });
+//           //res.json(req.session.user)
+//         } else {
+//           return res.json({
+//             mensagem: false,
+//             message: "Email ou senha incorretos.",
+//           });
+//         }
+//       } else {
+//         return res.json({
+//           mensagem: false,
+//           message: "Email ou senha incorretos.",
+//         });
+//       }
+//     });
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({
+//         mensagem: false,
+//         message: "Erro ao logar",
+//         error: error.message,
+//       });
+//   }
+// });
 
 //  Criando User
 router.post("/user/new", async (req, res) => {
@@ -126,6 +187,7 @@ router.post("/user/logout", (req, res) => {
     }
     // Se a sessão for destruída com sucesso, remove o cookie de sessão
     res.clearCookie("connect.sid"); // O nome do cookie pode variar dependendo da configuração
+
     return res.status(200).json({ message: "Logout bem-sucedido" });
   });
 });
