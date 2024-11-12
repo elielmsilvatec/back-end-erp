@@ -168,11 +168,11 @@ router.post("/user/new", async (req, res) => {
             .json({ message: "Cadastrado com sucesso. Faça login!" });
         });
       } else {
-        return res.json({ message: "Por favor, insira um email válido." });
+        return   res.status(409).json({ message: "Por favor, insira um email válido." });
       }
     } else {
       if (vazio != 1) {
-        return res.json({ message: "O email já está cadastrado." });
+        return   res.status(500).json({ message: "O email já está cadastrado." });
       }
     }
   });
