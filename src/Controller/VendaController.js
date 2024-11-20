@@ -11,7 +11,9 @@ const Cliente = require("../Model/ClienteModel");
 const User = require("../User/UserModel");
 
 const moment = require("moment");
-const { exit } = require("browser-sync");
+
+// gerar pdf com puppeteer
+const puppeteer = require("puppeteer");
 
 // ler
 router.get("/venda/vendas", Auth, async (req, res) => {
@@ -154,6 +156,7 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       data_entrega,
       val_taxas,
       lucro,
+      imprimir,
     } = req.body;
 
     // já vem formatado apensas converter de String para Float
@@ -229,33 +232,33 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       }
     );
 
-      // atualizando o estoque
-      const itens = await ItemPedido.findAll({
-        where: { pedido: IDpedido, usuario: req.session.user.id },
-        transaction,
-      });
-      
-      const produtoIDs = itens.map((item) => item.produtoID);
-      const quantidadesItens = itens.reduce((acc, item) => {
-        acc[item.produtoID] = item.quant_itens;
-        return acc;
-      }, {});
-      
-      const produtos = await Produto.findAll({
-        where: { id: produtoIDs, usuario: req.session.user.id },
-        transaction,
-      });
-      
-      for (const produto of produtos) {
-        const quantidadeEstoqueAtualizada =
-          produto.quantidadeEstoque - quantidadesItens[produto.id];
-          // console.log(" Estoque " ,  produto.quantidadeEstoque  , " Nova quant ",quantidadesItens[produto.id] )          
-        await Produto.update(
-          { quantidadeEstoque: quantidadeEstoqueAtualizada },
-          { where: { id: produto.id, usuario: req.session.user.id }, transaction }
-        );
-      }
-      
+
+    // atualizando o estoque
+    const itens = await ItemPedido.findAll({
+      where: { pedido: IDpedido, usuario: req.session.user.id },
+      transaction,
+    });
+
+    const produtoIDs = itens.map((item) => item.produtoID);
+    const quantidadesItens = itens.reduce((acc, item) => {
+      acc[item.produtoID] = item.quant_itens;
+      return acc;
+    }, {});
+
+    const produtos = await Produto.findAll({
+      where: { id: produtoIDs, usuario: req.session.user.id },
+      transaction,
+    });
+
+    for (const produto of produtos) {
+      const quantidadeEstoqueAtualizada =
+        produto.quantidadeEstoque - quantidadesItens[produto.id];
+      // console.log(" Estoque " ,  produto.quantidadeEstoque  , " Nova quant ",quantidadesItens[produto.id] )
+      await Produto.update(
+        { quantidadeEstoque: quantidadeEstoqueAtualizada },
+        { where: { id: produto.id, usuario: req.session.user.id }, transaction }
+      );
+    }
 
     await transaction.commit();
 
@@ -263,10 +266,14 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       where: { usuario: req.session.user.id },
     });
 
-    res.render("venda/vendas", {
-      venda_finalizada,
-      moment,
-    });
+    if (imprimir == 1) {
+     res.redirect(`/venda/ver/${IDpedido}`);
+    } else {
+      res.render("venda/vendas", {
+        venda_finalizada,
+        moment,
+      });
+    }
   } catch (error) {
     await transaction.rollback();
     return res.status(500).json({ error: "Erro ao finalizar venda! " });
@@ -402,7 +409,49 @@ router.get("/venda/ver/:id", Auth, async (req, res) => {
   }
 });
 
-// Recebendo os dados para  enviar a tela de imprimir_venda
+// // Recebendo os dados para  enviar a tela de imprimir_venda
+// router.get("/venda/imprimir/:id", Auth, async (req, res) => {
+//   const id = req.params.id;
+//   try {
+//     // ver se tem produtos no item
+//     const itemPedido = await ItemPedido.findAll({
+//       where: { pedido: id, usuario: req.session.user.id },
+//     });
+//     // Busca o pedido e os produtos e aguarda o resultado
+//     const [pedido] = await Promise.all([Pedido.findOne({ where: { id } })]);
+//     if (!pedido) {
+//       // Caso o pedido não seja encontrado, retorna um erro 404
+//       return res.status(404).render("404");
+//     }
+
+//     const cliente = await Cliente.findOne({
+//       where: { id: pedido.cliente_pedido, usuario: req.session.user.id },
+//     });
+//     const venda = await Venda.findOne({
+//       where: { id_pedido: pedido.id, usuario: req.session.user.id },
+//     });
+
+//     //recebendo os dados de cadastro do usuario
+//     const userId = req.session.user.id;
+//     const user = await User.findOne({ where: { id: userId } }); // Use "id" em vez de "usuario"
+
+//     // Renderiza a página e passa as informações do pedido e dos produtos como variáveis para a view
+//     res.render("venda/imprimir_venda", {
+//       pedido,
+//       id,
+//       itemPedido,
+//       cliente,
+//       venda,
+//       moment,
+//       user,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Erro ao buscar venda" });
+//     req.flash("erro_msg", "Erro ao carregar entrega!");
+//     res.redirect("/");
+//   }
+// });
+
 router.get("/venda/imprimir/:id", Auth, async (req, res) => {
   const id = req.params.id;
   try {
@@ -428,16 +477,48 @@ router.get("/venda/imprimir/:id", Auth, async (req, res) => {
     const userId = req.session.user.id;
     const user = await User.findOne({ where: { id: userId } }); // Use "id" em vez de "usuario"
 
-    // Renderiza a página e passa as informações do pedido e dos produtos como variáveis para a view
-    res.render("venda/imprimir_venda", {
-      pedido,
-      id,
-      itemPedido,
-      cliente,
-      venda,
-      moment,
-      user,
+    const html = await new Promise((resolve, reject) => {
+      res.render(
+        "venda/imprimir_venda",
+        { pedido, id, itemPedido, cliente, user, venda },
+        (err, html) => {
+          if (err) {
+            console.error("Erro ao renderizar HTML:", err);
+            return reject(err);
+          } else {
+            return resolve(html);
+          }
+        }
+      );
     });
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    // Gera o PDF sem margens
+    const pdfBuffer = await page.pdf({
+      // format: "A4",
+      // width: '80mm',
+      // height: 'auto',
+      margin: { top: 0, right: 0, bottom: 0, left: 0 }, // Remove as margens
+      width: '70mm',   // Largura de 70mm, o tamanho do papel da impressora térmica
+      height: '200mm', // Defina uma altura apropriada (dependendo do seu conteúdo)
+      printBackground: true,
+    });
+    await browser.close();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="venda_${venda.id}.pdf"`
+    );
+
+    res.end(pdfBuffer, "binary");
+
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar venda" });
     req.flash("erro_msg", "Erro ao carregar entrega!");
@@ -452,18 +533,18 @@ router.post("/vendas/deletar/:id", async (req, res) => {
     const IDpedido = req.body.id_pedido;
     const obs = req.body.obs;
     // atualiza o status para 2 da tabela "vendas" indica que é uma venda cancelada
-    await Venda.update(
-      {
-        fechado: 2,
-        obs: obs,
-      },
-      {
-        where: {
-          id: id,
-          usuario: req.session.user.id,
-        },
-      }
-    );
+    // await Venda.update(
+    //   {
+    //     fechado: 2,
+    //     obs: obs,
+    //   },
+    //   {
+    //     where: {
+    //       id: id,
+    //       usuario: req.session.user.id,
+    //     },
+    //   }
+    // );
 
     // atualizando o estoque
     const itens = await ItemPedido.findAll({
@@ -488,13 +569,63 @@ router.post("/vendas/deletar/:id", async (req, res) => {
       );
     }
 
-    const venda_finalizada = await Venda.findAll({
-      where: { usuario: req.session.user.id },
+    // const venda_finalizada = await Venda.findAll({
+    //   where: { usuario: req.session.user.id },
+    // });
+    // res.render("venda/vendas", {
+    //   venda_finalizada,
+    //   moment,
+    // });
+
+    const id_pedido = await Pedido.findByPk(IDpedido, {
+      where: { id: IDpedido, usuario: req.session.user.id },
     });
-    res.render("venda/vendas", {
-      venda_finalizada,
-      moment,
+
+    const id_item = await ItemPedido.findAll({
+      where: { pedido: id_pedido.id, usuario: req.session.user.id },
     });
+
+    const venda = await Venda.findByPk(id);
+    if (!venda) {
+      return res.status(404).json({ error: "Produto não encontrado." });
+    }
+
+    // Deleta todos os itens do pedido
+    if (id_item && id_item.length > 0) {
+      for (const item of id_item) {
+        await item.destroy(); // Deleta cada item individualmente
+      }
+    }
+
+    // Deleta o pedido e a venda
+    await venda.destroy();
+    await id_pedido.destroy();
+
+    req.flash("erro_msg", "Venda apagada com sucesso!");
+    res.redirect("/venda/vendas_finalizadas");
+  } catch (err) {
+    console.error("Erro ao deletar os dados de vendas:", err);
+    return res
+      .status(500)
+      .json({ mensagem: "Ocorreu um erro ao deletar os dados de vendas." });
+  }
+});
+
+// deletando venda DEFINITIVAMENTE
+router.post("/vendas/delet/:id", async (req, res) => {
+  try {
+    // atualiza o status para 2 da tabela "vendas" indica que é uma venda cancelada
+
+    const { id } = req.params;
+
+    const venda = await Venda.findByPk(id);
+    if (!venda) {
+      return res.status(404).json({ error: "Produto não encontrado." });
+    }
+    await venda.destroy();
+
+    req.flash("erro_msg", "Venda apagada com sucesso!");
+    res.redirect("/venda/vendas_finalizadas");
   } catch (err) {
     console.error("Erro ao deletar os dados de vendas:", err);
     return res

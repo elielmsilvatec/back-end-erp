@@ -91,54 +91,6 @@ router.post("/user/login", async (req, res) => {
 });
 
 
-
-// // login
-// router.post("/user/login", async (req, res) => {
-//   var email = req.body.email;
-//   var senha = req.body.senha;
-
-//   try {
-//     if (!email || email.trim() === "") {
-//       req.flash("erro_msg_login", "Email ou senha incorretos...!");
-//       return res.redirect("login");
-//     }
-
-//     User.findOne({ where: { email: email } }).then((user) => {
-//       if (user != undefined) {
-//         var correct = bcrypt.compareSync(senha, user.senha);
-//         if (correct) {
-//           req.session.user = {
-//             id: user.id,
-//             nome: user.nome,
-//             email: user.email,
-//             cargo: "vendedor",
-//           };
-//           return res.status(200).json({ message: "Login bem-sucedido" , user :   req.session.user });
-//           //res.json(req.session.user)
-//         } else {
-//           return res.json({
-//             mensagem: false,
-//             message: "Email ou senha incorretos.",
-//           });
-//         }
-//       } else {
-//         return res.json({
-//           mensagem: false,
-//           message: "Email ou senha incorretos.",
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({
-//         mensagem: false,
-//         message: "Erro ao logar",
-//         error: error.message,
-//       });
-//   }
-// });
-
 //  Criando User
 router.post("/user/new", async (req, res) => {
   var nome = req.body.nome;

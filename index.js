@@ -25,7 +25,7 @@ const ControleFinanceiroController = require("./src/Controller/ControleFinanceir
 
 const cors = require('cors');
 // Configurar CORS
-const allowedOrigins = ['http://localhost:3000','http://localhost:3001', 'https://fron-end-construerp-production.up.railway.app'];
+const allowedOrigins = ['http://localhost:3000','http://localhost:3001', 'https://fron-end-construerp-production.up.railway.app', 'https://fron-end-construerp.vercel.app'];
 
 app.use(cors({
     origin: function (origin, callback) {

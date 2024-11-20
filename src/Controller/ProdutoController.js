@@ -95,8 +95,7 @@ router.post("/produtos/save", Auth, async (req, res) => {
 
     if (produtoExistente) {
       // Produto com o mesmo nome já existe, exiba uma mensagem de erro ou tome a ação apropriada
-      req.flash("erro_msg", "Produto com o mesmo nome já existe");
-      res.redirect("/produto/produtos");
+      return res.status(400).json({ msg: "Produto com o mesmo nome já existe!" });
     } else {
       // Se não existe um produto com o mesmo nome, insira ao banco de dados
       var unidadeMedida = req.body.unidadeMedida;
@@ -142,7 +141,7 @@ router.delete("/produtos/del/:id", Auth, async (req, res) => {
       return res.status(404).json({ error: "Produto não encontrado." });
     }
     await produto.destroy();
-    return res.status(200).json({ message: "Produto excluid com sucesso!" });
+    return res.status(200).json({ message: "Produto excluido com sucesso!" });
   } catch (error) {
     return res
       .status(500)
@@ -168,7 +167,7 @@ router.get("/produtos/view/:id", Auth, async (req, res) => {
 });
 
 // Recebendo os dados da tela de editar produtos e atualizando (update)
-router.post("/produtos/edit/save/:id", Auth, async (req, res) => {
+router.put("/produto/atualizar/:id", Auth, async (req, res) => {
   // console.log(req.body);
   // console.log(req.params);
   const id = req.params.id;
