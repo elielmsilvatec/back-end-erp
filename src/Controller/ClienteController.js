@@ -61,7 +61,7 @@ router.post('/cliente/save',  Auth, async (req, res) => {
         usuario: req.session.user.id,
       });
 
-      return res.status(201).json({
+      return res.status(200).json({
         message: 'Cliente criado com sucesso!',
         cliente: novoCliente,
       });
@@ -73,91 +73,55 @@ router.post('/cliente/save',  Auth, async (req, res) => {
     });
   }
 });
-// router.post('/cliente/save', Auth, async (req, res) => {
-//   var nome = req.body.nome;
-
-//   if (nome != undefined) {
-//     // Consulta para verificar se já existe um cliente com o mesmo nome
-//     const clienteExistente = await Cliente.findOne({ where: {usuario: req.session.user.id , nome: nome } });
-
-//     if (clienteExistente) {
-//       // Cliente com o mesmo nome já existe, exiba uma mensagem de erro ou tome a ação apropriada
-//       req.flash('erro_msg', 'Cliente com o mesmo nome já existe');
-//       res.redirect('/cliente/clientes');
-//     } else {
-//       // Se não existe um cliente com o mesmo nome, insira ao banco de dados
-//       var telefone = req.body.telefone;
-//       var cep = req.body.cep ?? null;
-//       var rua = req.body.rua ?? null;
-//       var numero = req.body.numero ?? null;
-//       var bairro = req.body.bairro ?? null;
-//       var cidade = req.body.cidade ?? null;
-//       var observacoes = req.body.observacoes ?? null;
-
-//       Cliente.create({
-//         nome: nome,
-//         telefone: telefone,
-//         cep: cep,
-//         rua: rua,
-//         numero: numero,
-//         bairro: bairro,
-//         cidade: cidade,
-//         observacoes: observacoes,
-//         usuario: req.session.user.id
-//       }).then(() => {
-//         req.flash('sucesso_msg', 'Cliente criado com sucesso!');
-//         res.redirect('/cliente/clientes');
-//       });
-//     }
-//   } else {
-//     req.flash('erro_msg', 'Erro ao cadastrar clientes');
-//     res.redirect('/cliente/clientes');
-//   }
-// });
-
 
 // Buscar cliente pelo nome 
 router.post('/cliente/buscar', Auth, async (req, res) => {
   try {
-    // const { busca } = req.body;
-    const busca = req.body.busca
+    const { pesquisar } = req.body; // Extrai o termo de busca do corpo da requisição
+    const userId = req.session.user.id; // Obtém o ID do usuário autenticado
+
+    // Busca clientes com o nome correspondente
     const clientes = await Cliente.findAll({
       where: {
         nome: {
-          [Op.like]: `%${busca}%`
+          [Op.like]: `%${pesquisar}%`
         },
-        usuario: req.session.user.id
+        usuario: userId
       },
-      limit: 20 // Limita para 20 resultados
+      limit: 20, // Limita para 20 resultados
     });
-    if (clientes.length > 0) {    // Verifica se algum cliente foi encontrado
-      res.render("cliente/clientes", {
-        clientes,
-      })
-    } else {
-      const clientes = await Cliente.findAll({
-        where: { usuario: req.session.user.id },
-        limit: 100,
-      });
-      const erro_msg = "Cliente não encontrado!"
-      res.render("cliente/clientes", {
-        clientes,
-        erro_msg
-      })
+
+    // Retorna os clientes encontrados
+    if (clientes.length > 0) {
+      return res.status(200).json({ success: true, clientes });
     }
+
+    // Caso nenhum cliente seja encontrado, retorna todos os clientes do usuário
+    const todosClientes = await Cliente.findAll({
+      where: { usuario: userId },
+      limit: 100,
+    });
+
+    return res.status(404).json({
+      success: false,
+      message: "Cliente não encontrado!",
+      clientes: todosClientes,
+    });
+
   } catch (error) {
-    const erro_msg = "Erro ao buscar cliente!"
-    res.render("cliente/clientes", {
-      erro_msg
-    })
+    console.error("Erro ao buscar cliente:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao buscar cliente!",
+    });
   }
 });
 
 
 
 
-// pagina cliente
-router.get('/cliente/editar/:id', Auth, async (req, res) => {
+// pagina cliente visualizar
+router.get('/cliente/view/:id', Auth, async (req, res) => {
   const clienteId = req.params.id;
 
   try {
@@ -166,9 +130,7 @@ router.get('/cliente/editar/:id', Auth, async (req, res) => {
       return res.status(404).json({ error: 'Cliente não encontrado' });
     }
 
-    res.render("cliente/editar_cliente", {
-      cliente,
-    })
+    res.status(200).json({ cliente });
 
   } catch (error) {
     return res.status(500).json({ error: 'Erro ao carregar a pagina!' });
@@ -177,7 +139,7 @@ router.get('/cliente/editar/:id', Auth, async (req, res) => {
 
 
 // editar um cliente
-router.post('/cliente/edit/save/:id', Auth, async (req, res) => {
+router.put('/cliente/edit/save/:id', Auth, async (req, res) => {
   try {
     const { nome, telefone, cep, rua, numero, bairro, cidade, observacoes } = req.body;
     const id = req.params.id;
@@ -208,7 +170,7 @@ router.post('/cliente/edit/save/:id', Auth, async (req, res) => {
       }
     );
 
-    return res.redirect("/cliente/clientes")
+    return res.status(200).json({ mensagem: 'Dados do cliente atualizados com sucesso!' });
   } catch (err) {
     console.error('Erro ao atualizar dados do cliente:', err);
     return res.status(500).json({ mensagem: 'Ocorreu um erro ao atualizar os dados do cliente.' });
@@ -229,7 +191,7 @@ router.get('/cliente/del/:id', Auth, async (req, res) => {
 
     await cliente.destroy();
 
-    res.redirect('/cliente/clientes')
+    res.status(200).json({ message: 'Cliente deletado com sucesso!' });
 
 
   } catch (error) {
