@@ -22,13 +22,13 @@ router.get("/pedido/pedidos", Auth, async (req, res) => {
       where: { status: 1, usuario: req.session.user.id },
       limit: 100,
     });
-    const cliente = await Cliente.findAll({
+    const clientes = await Cliente.findAll({
       where: { usuario: req.session.user.id },
     });
-    
-    res.render("pedido/pedidos", {
+
+    return res.status(200).json({
       pedidos,
-      cliente,
+      clientes,
     });
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar pedidos" });
@@ -49,7 +49,7 @@ router.get("/pedido/pedidos_fechados", Auth, async (req, res) => {
       where: { usuario: req.session.user.id },
     });
 
-    res.render("pedido/pedidos_fechados", {
+    return res.status(500).json({
       pedidos,
       cliente,
     });
@@ -60,29 +60,34 @@ router.get("/pedido/pedidos_fechados", Auth, async (req, res) => {
 
 // adiciono novo pedido criando um item pedido
 router.post("/pedido/add_novo", Auth, async (req, res) => {
-  var quantidade = 0;
-  var status = 1;
-  var valor_total_pedido = 0;
+  try {
+    var quantidade = 0;
+    var status = 1;
+    var valor_total_pedido = 0;
 
-  var ultimoId = await Pedido.max("num_pedido", {
-    where: { usuario: req.session.user.id },
-  });
-  ultimoId = ultimoId + 1;
+    var ultimoId = await Pedido.max("num_pedido", {
+      where: { usuario: req.session.user.id },
+    });
+    ultimoId = ultimoId + 1;
 
-  await Pedido.create({
-    num_pedido: ultimoId,
-    quantidade: quantidade,
-    status: status,
-    valor_total_pedido: valor_total_pedido,
-    usuario: req.session.user.id,
-  });
+    await Pedido.create({
+      num_pedido: ultimoId,
+      quantidade: quantidade,
+      status: status,
+      valor_total_pedido: valor_total_pedido,
+      usuario: req.session.user.id,
+    });
 
-  const pedido = await Pedido.findOne({
-    where: { num_pedido: ultimoId, usuario: req.session.user.id },
-  });
-  res.render("pedido/itemPedido", {
-    pedido,
-  });
+    const pedido = await Pedido.findOne({
+      where: { num_pedido: ultimoId, usuario: req.session.user.id },
+    });
+
+    return res.status(200).json({ pedido });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Ocorreu um erro ao adicionar o pedido." });
+  }
 });
 
 // deletando um pedido
@@ -102,8 +107,7 @@ router.get("/pedido/delet/:id", Auth, async (req, res) => {
     // Deleta o pedido
     await pedido.destroy();
 
-    // Redireciona para a página de pedidos
-    res.redirect("/pedido/pedidos");
+    return res.status(200).json({ message: "Pedido excluído com sucesso." });
   } catch (error) {
     return res
       .status(500)
@@ -129,13 +133,7 @@ router.get("/pedido/ver/:id", Auth, async (req, res) => {
       where: { id: pedido.cliente_pedido, usuario: req.session.user.id },
     });
 
-    // Renderiza a página e passa as informações do pedido e dos produtos como variáveis para a view
-    res.render("pedido/itemPedido", {
-      pedido,
-      id,
-      itemPedido,
-      cliente,
-    });
+    return res.status(200).json({ pedido, itemPedido, cliente });
   } catch (error) {
     //res.redirect('/pedido/pedidos')
     return res.status(500).json({ error: "Erro ao buscar pedido" });
@@ -162,26 +160,15 @@ router.post("/pedido/buscar/produto", Auth, async (req, res) => {
     const [pedido] = await Promise.all([Pedido.findOne({ where: { id } })]);
 
     if (produtos.length > 0) {
-      // Verifica se algum produto foi encontdora
-      res.render("pedido/itemPedido", {
-        produtos,
-        pedido,
-      });
+      return res.status(200).json({ produtos, pedido });
     } else {
-      const erro_msg = "Produto não encontrado!";
-      res.render("pedido/itemPedido", {
-        pedido,
-        erro_msg,
-      });
+      return res.status(404).json({ error: "Produto não encontrado!" });
     }
   } catch (error) {
     res.send("Erro cath");
     const pedido = Pedido.findOne({ where: { id } });
     //req.flash('erro_msg', 'Erro ao buscar produto!')
-    res.render("pedido/itemPedido", {
-      pedido,
-      erro_msg: "Erro ao buscar produtos",
-    });
+    return res.status(500).json({ error: "Erro ao buscar produtos!" });
   }
 });
 
@@ -205,26 +192,13 @@ router.post("/pedido/buscar/cliente", Auth, async (req, res) => {
     const [pedido] = await Promise.all([Pedido.findOne({ where: { id } })]);
 
     if (clientes.length > 0) {
-      // Verifica se algum produto foi encontdora
-      res.render("pedido/itemPedido", {
-        clientes,
-        pedido,
-      });
+      return res.status(200).json({ clientes, pedido });
     } else {
-      const erro_msg = "Cliente não encontrado!";
-      res.render("pedido/itemPedido", {
-        pedido,
-        erro_msg,
-      });
+      return res.status(404).json({ pedido, error: "Cliente não encontrado!" });
     }
   } catch (error) {
-    res.send("Erro cath");
     const pedido = Pedido.findOne({ where: { id } });
-    const erro_msg = "Erro ao buscar cliente!";
-    res.render("pedido/itemPedido", {
-      pedido,
-      erro_msg,
-    });
+    return res.status(500).json({ pedido, error: "Erro ao buscar clientes!" });
   }
 });
 
@@ -254,16 +228,16 @@ router.post("/pedido/cliente/add_novo", Auth, async (req, res) => {
       where: { pedido: id_pedido, usuario: req.session.user.id },
     });
 
-    res.render("pedido/itemPedido", {
+    return res.status(200).json({
       pedido,
       itemPedido,
       cliente,
     });
   } catch (error) {
-    res.send("Erro ao tentar adicionar cliente ao pedido!");
+    return res.send("Erro ao tentar adicionar cliente ao pedido!");
   }
 });
-
+// ----------------------------------------------------------------------------------------back ende só pra cima-----------------------------------------------------------------------
 ///  Adicionando produto ao item pedido produtos
 router.post("/pedido/add/produto_item", Auth, async (req, res) => {
   try {
