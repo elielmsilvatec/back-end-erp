@@ -3,7 +3,7 @@
 
 
 
-    <div class="row">
+    <!-- <div class="row">
         <div class="col d-flex justify-content-between">
             <p class="fs-3">Vendas finalizada</p>
 
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    Modal
     <div class="modal fade" id="modalCancelamento" tabindex="-1" aria-labelledby="modalCancelamentoLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -42,7 +42,23 @@
             </div>
         </div>
         </form>
+    </div> -->
+
+    <div class="row">
+        <div class="col d-flex justify-content-between">
+            <p class="fs-3">Vendas finalizada</p>
+
+            <% if ( venda.fechado ) { %>
+                <form action="/vendas/deletar/<%= venda.id %>" method="post">
+                    <input type="text" name="id_pedido" value="<%= pedido.id %>" class="none">
+                    <button type="submit" class="btn btn-outline-danger btn-sm confirm-delete">
+                        <i class="bi bi-trash"> </i>Cancelar venda
+                    </button>
+                </form>
+                <%}%>
+        </div>
     </div>
+
 
     <script>
         function enviarFormulario() {
@@ -135,20 +151,20 @@
 
                         </table>
                         <div class="text-right">
-                         <% if( venda.desconto) {%>
-                            <p>Desconto: <strong>
-                                    <%= venda.desconto.toLocaleString('pt-BR', { style: 'currency' ,
-                                        currency: 'BRL' }) %>
-                                </strong>
-                            </p>
-                         <%}%>
-                         <% if( venda.taxas) {%>
-                            <p>Taxas: <strong>
-                                    <%= venda.taxas.toLocaleString('pt-BR', { style: 'currency' ,
-                                        currency: 'BRL' }) %>
-                                </strong>
-                            </p>
-                         <%}%>
+                            <% if( venda.desconto) {%>
+                                <p>Desconto: <strong>
+                                        <%= venda.desconto.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL'
+                                            }) %>
+                                    </strong>
+                                </p>
+                                <%}%>
+                                    <% if( venda.taxas) {%>
+                                        <p>Taxas: <strong>
+                                                <%= venda.taxas.toLocaleString('pt-BR', { style: 'currency' ,
+                                                    currency: 'BRL' }) %>
+                                            </strong>
+                                        </p>
+                                        <%}%>
                         </div>
 
                         <div class="text-right">
@@ -224,8 +240,7 @@
 
                         <!-- Botão para abrir o modal -->
                         <a href="/venda/imprimir/<%= pedido.id %>" target="_blank">
-                            <button id="Botao_imprimir" type="button" class="btn btn-primary btn-sm"> Visualização de
-                                Impressão
+                            <button id="Botao_imprimir" type="button" class="btn btn-primary btn-sm">Imprimir venda
                             </button>
                         </a>
 
@@ -234,9 +249,15 @@
                                 event.stopPropagation();
                             });
                         </script>
-
-
-
+                        <script>  // confirmar antes de deletar -> envia para o script.js (SweetAlert2)
+                            const del = document.querySelectorAll('.confirm-delete');
+                            del.forEach(button => {
+                                button.addEventListener('click', function (event) {
+                                    event.preventDefault();
+                                    AlertaClass(this.form);
+                                });
+                            });
+                        </script>
 
 
                         <%- include('../partials/footer.ejs') %>

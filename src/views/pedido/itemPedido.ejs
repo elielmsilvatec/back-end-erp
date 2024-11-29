@@ -341,15 +341,51 @@
                                                             <i class="bi bi-trash"> </i>Deletar</button>
                                                         <% if(somaTotal> 0 ){ %>
                                                     </form>
+                                                    <form action="/pedido/imprimir/<%= pedido.id %>" method="get">
+                                                        <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                            style="display:none;">
+
+                                                            <button type="submit" class="btn btn">
+                                                                <i class="bi bi-printer"> </i>
+                                                                Imprimir orçamento
+                                                              </button>
+                                                              
+                                                    </form>
+                                                  
+                                                    <!-- <form action="/pedido/imprimir_ver/<%= pedido.id %>" method="get">
+                                                        <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                            style="display:none;">
+
+                                                            <button type="submit" class="btn btn">
+                                                                <i class="bi bi-printer"> </i>
+                                                                Ver orçamento
+                                                              </button>
+                                                              
+                                                    </form> -->
                                                     <form action="/pedido/finalizar/item" method="post">
                                                         <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                            style="display:none;">
+                                                            <input name="finalizar_venda" type="number" value="0"
+                                                            style="display:none;">
+
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="bi bi-cart-check"> </i>Fechar
+                                                            pedido</button>
+                                                    </form>
+
+                                                    <form action="/pedido/finalizar/item" method="post">
+                                                        <input name="IDpedido" type="number" value="<%= pedido.id %>"
+                                                            style="display:none;">
+                                                            <input name="finalizar_venda" type="number" value="1"
                                                             style="display:none;">
 
                                                         <button type="submit" class="btn btn-success">
                                                             <i class="bi bi-cart-check"> </i>Finalizar
-                                                            pedido</button>
+                                                            venda</button>
                                                     </form>
+
                                                     <%} %>
+                                                    
                                                 </div>
                                             </div>
 

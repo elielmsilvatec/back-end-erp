@@ -8,18 +8,21 @@
     @media print {
       body {
         font-family: Arial, sans-serif;
-        font-size: 10px;
+        font-size: 8pt;
         margin: 0;
-        padding: 1px;
+        padding: 0;
       }
 
       .container {
-        width: 70mm;
-        padding: 5px;
-        margin-left: 1px; /* Garante alinhamento à esquerda */
+        width: 80mm;
+        /* margin: 0 auto;  // REMOVA ESTA LINHA */
+        padding: 10px;
       }
 
-  
+      .header {
+        text-align: center;
+        margin-bottom: 10px;
+      }
 
       .content {
         margin-bottom: 10px;
@@ -37,64 +40,59 @@
 
       th,
       td {
-        /* border: 1px solid black; */
+        border: 1px solid black;
         padding: 5px;
         text-align: left;
       }
 
       .total-row td {
-        /* border-top: 2px solid black; */
-        text-align: left;
+        border-top: 2px solid black;
+        text-align: right;
       }
     }
-
-    .container {
-        font-size: 10px;      
-      }
   </style>
-
 </head>
 
 <body>
   <div class="container">
     <div class="header">
-      <h2>**VENDA FINALIZADA**</h2>
+      <h2>**ORÇAMENTO**</h2>
       <p>
         <strong style="font-size: 20px;">
-        -  <%= user.nome %>
+          <%= user.nome %>
         </strong></br>
-       - CNPJ: <strong>
+        CNPJ: <strong>
           <%= user.cnpj %>
         </strong> </br>
-       - Telefone: <strong>
+        Telefone: <strong>
           <%= user.telefone %>
         </strong> </br>
-       - Endereço: <%= user.rua %>
+        Endereço: <%= user.rua %>
           <%= user.bairro %>
             <%= user.cidade %></br>
-             - <%= user.uf %>
+              <%= user.uf %>
       </p>
     </div>
     <div class="content">
       <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
         <strong>Informações do Cliente:</strong>
-        </br
-          <strong>-Nome:</strong>
+        <p>
+          <strong>Nome:</strong>
           <%= cliente.nome %><br>
-            <strong>-Telefone:</strong>
+            <strong>Telefone:</strong>
             <%= cliente.telefone %><br>
-              <strong>-Rua:</strong>
+              <strong>Rua:</strong>
               <%= cliente.rua %><br>
-                <strong>-Número:</strong>
+                <strong>Número:</strong>
                 <%= cliente.numero %><br>
-                  <strong>-CEP:</strong>
+                  <strong>CEP:</strong>
                   <%= cliente.cep %><br>
-                    <strong>-Bairro:</strong>
+                    <strong>Bairro:</strong>
                     <%= cliente.bairro %><br>
-                      <strong>-Cidade:</strong>
-                      <%= cliente.cidade %> 
+                      <strong>Cidade:</strong>
+                      <%= cliente.cidade %><br>
                         <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
-      
+        </p>
         <% } %>
           <% if (typeof itemPedido !=='undefined' ) { %>
             <table>
@@ -116,20 +114,20 @@
                     <!-- <td style="text-align: center;">
                       <%= item.undMedidas %>
                     </td> -->
-                    <td  >
+                    <td style="text-align: center;">
                       <%= item.quant_itens %>
                     </td>
                     <td>
                       <%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); %>
                     </td>
-                    <td >
+                    <td style="text-align: right">
                       <%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
                     </td>
                   </tr>
                   <% }) %>
                     <tr class="total-row">
                       <td colspan="3">Valor total do pedido:</td>
-                      <td  >
+                      <td style="text-align: right">
                         <%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' })
                           %>
                       </td>
@@ -137,25 +135,13 @@
                     </tr>
               </tbody>
             </table>
-
-            <div class="header">
-              <p>   </br>
-               - Pago em: <strong>
-                  <%= venda.tipo_pagamento %>
-                </strong> </br>
-            
-              </p>
-            </div>
-            <!-- <div style="
+            <div style="
             background-color: blue;
             width: 48mm;
-            ">dlsakldjlas</div> -->
+            
+            
+            ">dlsakldjlas</div>
             <% } %>
-
-          <div class="footer">
-            <br>
-            <h6>Agradecemos a preferência.</h6>
-          </div>
     </div>
   </div>
 </body>

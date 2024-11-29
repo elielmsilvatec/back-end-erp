@@ -45,11 +45,6 @@ app.use(cors({
 //     credentials: true, // Permitir credenciais, ajuste conforme necessário
 // }));
 
-const cookieParser = require('cookie-parser'); // Adicione esta linha
-
-app.use(cookieParser()); // Adicione esta linha para usar o cookie-parser
-
-// Configuração de CORS para permitir cookies
 
 
 // configurando sessão
@@ -83,8 +78,8 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname + "/public/"));
 
 // Views
-// app.set('views', path.join(__dirname, 'src/views'));
-// app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'src/views'));
+app.set('view engine', 'ejs');
 
 
 // Body Parser Formulários

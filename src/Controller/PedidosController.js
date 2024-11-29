@@ -168,7 +168,7 @@ router.post("/pedido/buscar/produto", Auth, async (req, res) => {
     res.send("Erro cath");
     const pedido = Pedido.findOne({ where: { id } });
     //req.flash('erro_msg', 'Erro ao buscar produto!')
-    return res.status(500).json({ error: "Erro ao buscar produtos!" });
+    return res.status(500).json({ pedido, error: "Erro ao buscar produtos!" });
   }
 });
 
@@ -232,12 +232,13 @@ router.post("/pedido/cliente/add_novo", Auth, async (req, res) => {
       pedido,
       itemPedido,
       cliente,
+      message: "Item adicionado ao pedido com sucesso.",
     });
   } catch (error) {
-    return res.send("Erro ao tentar adicionar cliente ao pedido!");
+    return res.status(400).json({message: "Erro ao tentar adicionar cliente ao pedido!"});
   }
 });
-// ----------------------------------------------------------------------------------------back ende só pra cima-----------------------------------------------------------------------
+
 ///  Adicionando produto ao item pedido produtos
 router.post("/pedido/add/produto_item", Auth, async (req, res) => {
   try {
@@ -277,12 +278,6 @@ router.post("/pedido/add/produto_item", Auth, async (req, res) => {
         { where: { id: itemPedidoExistente.id } }
       );
 
-      // Atualizando quantidade em estoque
-      //  await Produto.update({
-      //   quantidadeEstoque :  itemProduto.quantidadeEstoque - 1
-      // }, {
-      //   where: { id: itemProduto.id }
-      // });
     } else {
       await ItemPedido.create({
         nome,
@@ -299,11 +294,6 @@ router.post("/pedido/add/produto_item", Auth, async (req, res) => {
         usuario: req.session.user.id,
       });
 
-      // await Produto.update({
-      //   quantidadeEstoque :  itemProduto.quantidadeEstoque - 1
-      // }, {
-      //   where: { id: itemProduto.id }
-      // });
     }
 
     const pedido = await Pedido.findOne({
@@ -331,14 +321,15 @@ router.post("/pedido/add/produto_item", Auth, async (req, res) => {
       { where: { id: IDpedido } }
     );
 
-    res.render("pedido/itemPedido", {
+    return res.status(200).json({
       pedido,
       itemPedido,
       cliente,
+      message: "Item adicionado ao pedido com sucesso.",
     });
   } catch (error) {
     console.error(error);
-    res
+    return res
       .status(500)
       .json({ message: "Ocorreu um erro ao adicionar o item ao pedido." });
   }
@@ -352,12 +343,14 @@ router.post("/pedido/editar/quant", Auth, async (req, res) => {
     const quant = req.body.quant.replace(/(\.|,)/g, (match, p1) =>
       p1 === "." ? "" : "."
     );
-    const valor_compra = req.body.valor_compra.replace(/(\.|,)/g, (match, p1) =>
-      p1 === "." ? "" : "."
-    );
-    const valor_unitario = req.body.valor_unitario
-      .replace(/(\.|,)/g, (match, p1) => (p1 === "." ? "" : "."))
-      .replace("R$", "");
+    // const valor_compra = req.body.valor_compra.replace(/(\.|,)/g, (match, p1) =>
+    //   p1 === "." ? "" : "."
+    // );
+    // const valor_unitario = req.body.valor_unitario
+    //   .replace(/(\.|,)/g, (match, p1) => (p1 === "." ? "" : "."))
+    //   .replace("R$", "");
+
+    
 
     const itemPedidoExistente = await ItemPedido.findOne({
       where: { id: id, pedido: IDpedido, usuario: req.session.user.id },
@@ -402,21 +395,21 @@ router.post("/pedido/editar/quant", Auth, async (req, res) => {
         { where: { id: IDpedido } }
       );
 
-      res.render("pedido/itemPedido", {
+      return res.status(200).json({
         pedido,
         itemPedido,
         cliente,
       });
+
     } else {
-      res.render("pedido/itemPedido", {
-        pedido,
-        itemPedido,
-        cliente,
-      });
+      return res
+        .status(201)
+        .json({ pedido, itemPedido, cliente, error: "Quantidade inválida." });
     }
   } catch (error) {
-    req.flash("erro_msg", "Ocorreu um erro ao atualizar a quantidade!");
-    res.redirect("/pedido/pedidos");
+ return res
+      .status(500)
+      .json({ error, message: "Ocorreu um erro ao adicionar o item ao pedido." });
   }
 });
 
@@ -464,7 +457,8 @@ router.post("/pedido/editar/valor_unitario", Auth, async (req, res) => {
           { valor_total_pedido: novoValorTotal },
           { where: { id: IDpedido } }
         );
-        res.render("pedido/itemPedido", {
+
+        return res.status(200).json({
           pedido,
           itemPedido,
           cliente,
@@ -480,15 +474,15 @@ router.post("/pedido/editar/valor_unitario", Auth, async (req, res) => {
           where: { id: pedido.cliente_pedido, usuario: req.session.user.id },
         });
         const erro_msg = "Valor do produto menor que o permitido! ";
-        res.render("pedido/itemPedido", {
-          pedido,
-          itemPedido,
-          cliente,
-          erro_msg,
-        });
+
+        return res
+          .status(201)
+          .json({ pedido, itemPedido, cliente, error: erro_msg });
       }
     } else {
-      res.send("Ocorreu um erro ao atualizar valor unitario!");
+      return res
+        .status(400)
+        .json({ error: "Ocorreu um erro ao atualizar valor unitario!" });
     }
   } catch (error) {
     return res
@@ -513,9 +507,13 @@ router.post("/pedido/finalizar/item", Auth, async (req, res) => {
       await item.update({ status: 2 });
 
       if (finalizar_venda == 1) {
-        res.redirect(`/venda/pedido/adicionar/${id}`);
+        return res
+          .status(200)
+          .json({ message: "Pedido finalizado com sucesso!" });
       } else {
-        res.redirect("/pedido/pedidos");
+        return res
+          .status(200)
+          .json({ message: "Pedido finalizado com sucesso!" });
       }
 
       // const pedido = await Pedido.findOne({ where: { id: id, usuario: req.session.user.id } })
@@ -533,7 +531,7 @@ router.post("/pedido/finalizar/item", Auth, async (req, res) => {
 });
 
 // deletando item pedido
-router.post("/pedido/delet/item", Auth, async (req, res) => {
+router.delete("/pedido/delet/item", Auth, async (req, res) => {
   const id = req.body.id;
   const IDpedido = req.body.IDpedido;
 
@@ -563,10 +561,9 @@ router.post("/pedido/delet/item", Auth, async (req, res) => {
       { where: { id: IDpedido } }
     );
 
-    res.render("pedido/itemPedido", {
-      pedido,
-      itemPedido,
-    });
+    return res
+      .status(200)
+      .json({ pedido, itemPedido, message: "Item excluido com sucesso!" });
   } catch (error) {
     return res
       .status(500)
