@@ -32,7 +32,7 @@ router.get("/venda/vendas", Auth, async (req, res) => {
 });
 
 // lista todos  pedidos
-router.post("/venda/pedido/buscar", Auth, async (req, res) => {
+router.get("/venda/pedido/buscar", Auth, async (req, res) => {
   //res.render("pedido/pedidos")
   try {
     // const venda = await Venda.findAll({ where: { usuario: req.session.user.id } });
@@ -41,15 +41,11 @@ router.post("/venda/pedido/buscar", Auth, async (req, res) => {
       where: { status: 2, usuario: req.session.user.id },
     });
 
-    const cliente = await Cliente.findAll({
+    const clientes = await Cliente.findAll({
       where: { usuario: req.session.user.id },
     });
 
-    res.render("venda/vendas", {
-      pedidos,
-      cliente,
-      moment,
-    });
+    return res.status(200).json({ pedidos, clientes });
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar pedidos" });
   }
@@ -232,7 +228,6 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       }
     );
 
-
     // atualizando o estoque
     const itens = await ItemPedido.findAll({
       where: { pedido: IDpedido, usuario: req.session.user.id },
@@ -267,7 +262,7 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
     });
 
     if (imprimir == 1) {
-     res.redirect(`/venda/ver/${IDpedido}`);
+      res.redirect(`/venda/ver/${IDpedido}`);
     } else {
       res.render("venda/vendas", {
         venda_finalizada,
@@ -505,8 +500,8 @@ router.get("/venda/imprimir/:id", Auth, async (req, res) => {
       // width: '80mm',
       // height: 'auto',
       margin: { top: 0, right: 0, bottom: 0, left: 0 }, // Remove as margens
-      width: '70mm',   // Largura de 70mm, o tamanho do papel da impressora térmica
-      height: '200mm', // Defina uma altura apropriada (dependendo do seu conteúdo)
+      width: "70mm", // Largura de 70mm, o tamanho do papel da impressora térmica
+      height: "200mm", // Defina uma altura apropriada (dependendo do seu conteúdo)
       printBackground: true,
     });
     await browser.close();
@@ -518,7 +513,6 @@ router.get("/venda/imprimir/:id", Auth, async (req, res) => {
     );
 
     res.end(pdfBuffer, "binary");
-
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar venda" });
     req.flash("erro_msg", "Erro ao carregar entrega!");

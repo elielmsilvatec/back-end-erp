@@ -45,13 +45,13 @@ router.get("/pedido/pedidos_fechados", Auth, async (req, res) => {
       limit: 100,
     });
 
-    const cliente = await Cliente.findAll({
+    const clientes = await Cliente.findAll({
       where: { usuario: req.session.user.id },
     });
 
-    return res.status(500).json({
+    return res.status(200).json({
       pedidos,
-      cliente,
+      clientes,
     });
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar pedidos" });
@@ -566,29 +566,8 @@ router.post("/pedido/delet/cliente", Auth, async (req, res) => {
     }
     await item.update({ cliente_pedido: null });
 
-    const pedido = await Pedido.findOne({
-      where: { id: id, usuario: req.session.user.id },
-    });
+    res.status(200).json({ message: "Cliente excluido com sucesso!" });
 
-    const itemPedido = await ItemPedido.findAll({
-      where: { pedido: id, usuario: req.session.user.id },
-    });
-
-    // Calcula o novo valor total do pedido somando o sub_total_itens de todos os itemPedido
-    const novoValorTotal = itemPedido.reduce(
-      (total, item) => total + item.sub_total_itens,
-      0
-    );
-    // Atualiza o valor_total_pedido no banco de dados
-    await Pedido.update(
-      { valor_total_pedido: novoValorTotal },
-      { where: { id: id } }
-    );
-
-    res.render("pedido/itemPedido", {
-      pedido,
-      itemPedido,
-    });
   } catch (error) {
     return res
       .status(500)
