@@ -235,7 +235,9 @@ router.post("/pedido/cliente/add_novo", Auth, async (req, res) => {
       message: "Item adicionado ao pedido com sucesso.",
     });
   } catch (error) {
-    return res.status(400).json({message: "Erro ao tentar adicionar cliente ao pedido!"});
+    return res
+      .status(400)
+      .json({ message: "Erro ao tentar adicionar cliente ao pedido!" });
   }
 });
 
@@ -277,7 +279,6 @@ router.post("/pedido/add/produto_item", Auth, async (req, res) => {
         },
         { where: { id: itemPedidoExistente.id } }
       );
-
     } else {
       await ItemPedido.create({
         nome,
@@ -293,7 +294,6 @@ router.post("/pedido/add/produto_item", Auth, async (req, res) => {
         itens_produto,
         usuario: req.session.user.id,
       });
-
     }
 
     const pedido = await Pedido.findOne({
@@ -350,8 +350,6 @@ router.post("/pedido/editar/quant", Auth, async (req, res) => {
     //   .replace(/(\.|,)/g, (match, p1) => (p1 === "." ? "" : "."))
     //   .replace("R$", "");
 
-    
-
     const itemPedidoExistente = await ItemPedido.findOne({
       where: { id: id, pedido: IDpedido, usuario: req.session.user.id },
     });
@@ -400,16 +398,18 @@ router.post("/pedido/editar/quant", Auth, async (req, res) => {
         itemPedido,
         cliente,
       });
-
     } else {
       return res
         .status(201)
         .json({ pedido, itemPedido, cliente, error: "Quantidade inválida." });
     }
   } catch (error) {
- return res
+    return res
       .status(500)
-      .json({ error, message: "Ocorreu um erro ao adicionar o item ao pedido." });
+      .json({
+        error,
+        message: "Ocorreu um erro ao adicionar o item ao pedido.",
+      });
   }
 });
 
@@ -494,7 +494,6 @@ router.post("/pedido/editar/valor_unitario", Auth, async (req, res) => {
 // Finalizando item pedido
 router.post("/pedido/finalizar/item", Auth, async (req, res) => {
   const id = req.body.IDpedido;
-  const finalizar_venda = req.body.finalizar_venda;
   try {
     const item = await Pedido.findByPk(id);
     if (!item.valor_total_pedido) {
@@ -506,22 +505,7 @@ router.post("/pedido/finalizar/item", Auth, async (req, res) => {
       // atualiza o status do pedido
       await item.update({ status: 2 });
 
-      if (finalizar_venda == 1) {
-        return res
-          .status(200)
-          .json({ message: "Pedido finalizado com sucesso!" });
-      } else {
-        return res
-          .status(200)
-          .json({ message: "Pedido finalizado com sucesso!" });
-      }
-
-      // const pedido = await Pedido.findOne({ where: { id: id, usuario: req.session.user.id } })
-      // const itemPedido = await ItemPedido.findAll({ where: { pedido: id, usuario: req.session.user.id } })
-      // // Calcula o novo valor total do pedido somando o sub_total_itens de todos os itemPedido
-      // const novoValorTotal = itemPedido.reduce((total, item) => total + item.sub_total_itens, 0);
-      // // Atualiza o valor_total_pedido no banco de dados
-      // await Pedido.update({ valor_total_pedido: novoValorTotal }, { where: { id: id } });
+      return res.status(200).json({ message: "Pedido finalizado com sucesso!" });
     }
   } catch (error) {
     return res
@@ -713,6 +697,14 @@ router.get("/pedido/imprimir/:id", Auth, async (req, res) => {
     );
 
     res.end(pdfBuffer, "binary");
+
+    // return res.status(200).json({ pdfBuffer, message: "Pedido impresso com sucesso" });
+
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    console.log(fullUrl); // Exemplo: "http://localhost:3000/cliente/clientes"
+    // res.send("URL completa: " + fullUrl);
+    // return res.status(200).json({ message: "Pedido impresso com sucesso", fullUrl });
+
   } catch (error) {
     console.error("Erro ao buscar pedido:", error);
     return res.status(500).json({ error: "Erro ao buscar pedido" });

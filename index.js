@@ -102,6 +102,7 @@ server.listen(process.env.PORT || 5000, () => {
     // });
 });
 
+
 // banco de dados
 
 connection
@@ -111,7 +112,6 @@ connection
     }).catch((erro) => {
         console.log(erro)
     })
-
 
 
 //Usando Rotas 
