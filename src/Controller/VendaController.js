@@ -272,10 +272,10 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
 // pagina ver todas as vendas finalizadas
 router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
   try {
-    const pedido = await Pedido.findAll({
+    const pedidos = await Pedido.findAll({
       where: { usuario: req.session.user.id },
     });
-    const cliente = await Cliente.findAll({
+    const clientes = await Cliente.findAll({
       where: { usuario: req.session.user.id },
     });
 
@@ -300,15 +300,10 @@ router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
       order: [["data_venda", "DESC"]],
     });
 
-    res.render("venda/vendas_finalizadas", {
-      venda_finalizada,
-      moment,
-      pedido,
-      cliente,
-    });
+    return res.status(200).json({ venda_finalizada, clientes , pedidos });
+   
   } catch (error) {
-    req.flash("erro_msg", "Erro ao carregar vendas!");
-    res.redirect("/");
+   return res.status(500).json({ error: "Erro ao buscar vendas" });
   }
 });
 
