@@ -84,8 +84,17 @@ router.post("/produto/buscar", Auth, async (req, res) => {
 
 // Criar novo - Está recebendo os dados do formulário via post
 router.post("/produtos/save", Auth, async (req, res) => {
-  var nomeProduto = req.body.nomeProduto;
-  var marca = req.body.marca;
+  // var nomeProduto = req.body.nomeProduto;
+  // var marca = req.body.marca;
+  const {
+    nomeProduto,
+    marca,
+    unidadeMedida,
+    observacoes,
+    quantidadeEstoque,
+    valorCompra,
+    valorVenda,
+  } = req.body;
 
   if (nomeProduto != undefined) {
     // Consulta para verificar se já existe um produto com o mesmo nome
@@ -98,18 +107,19 @@ router.post("/produtos/save", Auth, async (req, res) => {
       return res.status(400).json({ msg: "Produto com o mesmo nome já existe!" });
     } else {
       // Se não existe um produto com o mesmo nome, insira ao banco de dados
-      var unidadeMedida = req.body.unidadeMedida;
-      var quantidadeEstoque = req.body.quantidadeEstoque.replace(
-        /(\.|,)/g,
-        (match, p1) => (p1 === "." ? "" : ".")
-      );
-      var valorCompra = req.body.valorCompra.replace(/(\.|,)/g, (match, p1) =>
-        p1 === "." ? "" : "."
-      );
-      var valorVenda = req.body.valorVenda.replace(/(\.|,)/g, (match, p1) =>
-        p1 === "." ? "" : "."
-      );
-      var observacoes = req.body.observacoes;
+      // var unidadeMedida = req.body.unidadeMedida;
+      // var quantidadeEstoque = req.body.quantidadeEstoque.replace(
+      //   /(\.|,)/g,
+      //   (match, p1) => (p1 === "." ? "" : ".")
+      // );
+      // var valorCompra = req.body.valorCompra.replace(/(\.|,)/g, (match, p1) =>
+      //   p1 === "." ? "" : "."
+      // );
+      // var valorVenda = req.body.valorVenda.replace(/(\.|,)/g, (match, p1) =>
+      //   p1 === "." ? "" : "."
+      // );
+      // var observacoes = req.body.observacoes;
+
 
       Produto.create({
         nomeProduto: nomeProduto,
@@ -176,19 +186,19 @@ router.put("/produto/atualizar/:id", Auth, async (req, res) => {
     marca,
     unidadeMedida,
     observacoes,
-    // quantidadeEstoque,
-    // valorCompra,
-    // valorVenda,
+    quantidadeEstoque,
+    valorCompra,
+    valorVenda,
   } = req.body;
-  var quantidadeEstoque = String(req.body.quantidadeEstoque).replace(/(\.|,)/g, (match, p1) => p1 === "." ? "" : ".");
-  var quantidadeEstoque = String(req.body.quantidadeEstoque).replace(",", ".");
-  var valorCompra = String(req.body.valorCompra).replace(/(\.|,)/g, (match, p1) =>
-    p1 === "." ? "" : "."
-  );
+  // var quantidadeEstoque = String(req.body.quantidadeEstoque).replace(/(\.|,)/g, (match, p1) => p1 === "." ? "" : ".");
+  // var quantidadeEstoque = String(req.body.quantidadeEstoque).replace(",", ".");
+  // var valorCompra = String(req.body.valorCompra).replace(/(\.|,)/g, (match, p1) =>
+  //   p1 === "." ? "" : "."
+  // );
 
-  var valorVenda = String(req.body.valorVenda).replace(/(\.|,)/g, (match, p1) =>
-    p1 === "." ? "" : "."
-  );
+  // var valorVenda = String(req.body.valorVenda).replace(/(\.|,)/g, (match, p1) =>
+  //   p1 === "." ? "" : "."
+  // );
 
   if (nomeProduto) {
     await Produto.update(

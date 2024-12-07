@@ -16,20 +16,20 @@ const moment = require("moment");
 const puppeteer = require("puppeteer");
 
 // ler
-router.get("/venda/vendas", Auth, async (req, res) => {
-  try {
-    const venda_finalizada = await Venda.findAll({
-      where: { usuario: req.session.user.id },
-    });
-    res.render("venda/vendas", {
-      venda_finalizada,
-      moment,
-    });
-  } catch (error) {
-    req.flash("erro_msg", "Erro ao carregar vendas!");
-    res.redirect("/");
-  }
-});
+// router.get("/venda/vendas", Auth, async (req, res) => {
+//   try {
+//     const venda_finalizada = await Venda.findAll({
+//       where: { usuario: req.session.user.id },
+//     });
+//     res.render("venda/vendas", {
+//       venda_finalizada,
+//       moment,
+//     });
+//   } catch (error) {
+//     req.flash("erro_msg", "Erro ao carregar vendas!");
+//     res.redirect("/");
+//   }
+// });
 
 // lista todos  pedidos
 router.get("/venda/pedido/buscar", Auth, async (req, res) => {
@@ -63,15 +63,6 @@ router.get("/venda/pedido/adicionar/:id", Auth, async (req, res) => {
     const venda_verifica = await Venda.findOne({
       where: { id_pedido: pedido.id },
     });
-    if (!venda_verifica) {
-      await Venda.create({
-        // data_venda: new Date(),
-        valor_total_venda: pedido.valor_total_pedido,
-        numero_pedido: pedido.num_pedido,
-        usuario: req.session.user.id,
-        id_pedido: pedido.id,
-      });
-    }
 
     const cliente = await Cliente.findOne({
       where: { id: pedido.cliente_pedido, usuario: req.session.user.id },
@@ -119,11 +110,25 @@ router.get("/venda/pedido/adicionar/:id", Auth, async (req, res) => {
       // Calculando o lucro
       // lucro = totalValorVenda - totalValorCompra;
       lucro = pedido.valor_total_pedido - totalValorCompra;
+      const totalLucro = lucro.toFixed(2);
+      console.log("Lucro calculado:", totalLucro);
+      if (!venda_verifica) {
+        await Venda.create({
+          // data_venda: new Date(),
+          valor_total_venda: pedido.valor_total_pedido,
+          numero_pedido: pedido.num_pedido,
+          usuario: req.session.user.id,
+          id_pedido: pedido.id,
+          lucro: totalLucro,
+        });
+      }
     } else {
-      console.log("Nenhum produto encontrado para os itens do pedido.");
+      return res
+        .status(500)
+        .json({ error: "Erro ao adicionar pedido a venda" });
     }
 
-    res.render("venda/vendas", {
+    return res.status(200).json({
       pedido,
       cliente,
       venda,
@@ -137,73 +142,58 @@ router.get("/venda/pedido/adicionar/:id", Auth, async (req, res) => {
 });
 
 // ------------------------------------------------------------
-// finalizando a venda apartir que clica no botão "finalizar"
+// // finalizando a venda apartir que clica no botão "finalizar"
+
 router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
   const transaction = await Processando.transaction();
+  console.log("Dados recebidos:", req.body);
+
   try {
-    const {
+    let {
       IDpedido,
       IDvenda,
-      form_pagamento,
-      quant_parcelas,
-      val_desconto,
-      valor_total_pedido,
-      entrega,
-      data_entrega,
-      val_taxas,
       lucro,
+      formaPagamento,
+      parcelas,
+      desconto,
+      valor_total_pedido,
+      entregar,
+      dataEntrega,
+      taxas,
       imprimir,
     } = req.body;
 
-    // já vem formatado apensas converter de String para Float
-    let lucro_total = parseFloat(lucro);
+    // Tratamento de valores
+    valor_total_pedido = parseFloat(valor_total_pedido) || 0;
+    taxas = parseFloat(taxas) || 0;
+    desconto = parseFloat(desconto) || 0;
+    lucro = parseFloat(lucro) || 0;
+    // const quant_parcelas = parcelas && !isNaN(parseFloat(parcelas)) ? parseFloat(parcelas) : null;
 
-    const valor_total_pedido_num = parseFloat(
-      valor_total_pedido.replace("R$", "").replace(".", "").replace(",", ".")
-    );
-    let valor_total_venda = valor_total_pedido_num;
+    if (taxas) desconto = 0;
+    if (desconto) taxas = 0;
 
-    if (val_desconto) {
-      const desconto_num = parseFloat(
-        val_desconto.replace(/(\.|,)/g, (match, p1) => (p1 === "." ? "" : "."))
-      );
-      valor_total_venda -= desconto_num;
-      lucro_total = lucro_total - desconto_num;
-    }
-    if (val_taxas) {
-      const val_taxas_num = parseFloat(
-        val_taxas.replace(/(\.|,)/g, (match, p1) => (p1 === "." ? "" : "."))
-      );
-      valor_total_venda += val_taxas_num;
+    lucro_total = lucro - desconto;
+    valor_total_pedido += taxas;
+
+    let dataEntregaValida = new Date();
+    if (dataEntrega !== "" && dataEntrega !== null) {
+      dataEntregaValida = new Date(dataEntrega);
     }
 
-    // para garantir que será apenas duas casas decimais
-    lucro_total = lucro_total.toFixed(2);
-
-    await Venda.update(
+    // Atualização no banco
+    const [affectedRows] = await Venda.update(
       {
         data_venda: new Date(),
-        tipo_pagamento: form_pagamento,
-        quant_parcelas: quant_parcelas,
-        valor_total_venda: valor_total_venda,
-        entrega: entrega,
-        data_entrega: data_entrega,
-        lucro: lucro_total,
+        tipo_pagamento: formaPagamento,
+        quant_parcelas: parcelas,
+        valor_total_venda: valor_total_pedido,
+        entrega: entregar,
+        data_entrega: dataEntregaValida,
+        lucro: parseFloat(lucro_total.toFixed(2)),
         fechado: 1,
-        desconto: val_desconto
-          ? parseFloat(
-              val_desconto.replace(/(\.|,)/g, (match, p1) =>
-                p1 === "." ? "" : "."
-              )
-            )
-          : null,
-        taxas: val_taxas
-          ? parseFloat(
-              val_taxas.replace(/(\.|,)/g, (match, p1) =>
-                p1 === "." ? "" : "."
-              )
-            )
-          : null,
+        desconto: desconto,
+        taxas: taxas,
       },
       {
         where: {
@@ -214,10 +204,17 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       }
     );
 
+    // Verificação
+    if (affectedRows === 0) {
+      throw new Error("Nenhum registro atualizado. Verifique os dados.");
+    }
+
+
+
     await Pedido.update(
       {
         status: 3,
-        valor_total_pedido: valor_total_venda,
+        valor_total_pedido: valor_total_pedido,
       },
       {
         where: {
@@ -257,23 +254,20 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
 
     await transaction.commit();
 
-    const venda_finalizada = await Venda.findAll({
-      where: { usuario: req.session.user.id },
-    });
-
-    if (imprimir == 1) {
-      res.redirect(`/venda/ver/${IDpedido}`);
-    } else {
-      res.render("venda/vendas", {
-        venda_finalizada,
-        moment,
-      });
-    }
+    // Resposta ao cliente
+    res.status(200).json({ message: "Venda finalizada com sucesso!" });
   } catch (error) {
+    console.error("Erro ao finalizar venda:", error);
+
+    // Rollback da transação
     await transaction.rollback();
-    return res.status(500).json({ error: "Erro ao finalizar venda! " });
+
+    res
+      .status(500)
+      .json({ error: "Erro ao finalizar venda.", details: error.message });
   }
 });
+
 
 // pagina ver todas as vendas finalizadas
 router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
