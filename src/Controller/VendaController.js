@@ -209,8 +209,6 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
       throw new Error("Nenhum registro atualizado. Verifique os dados.");
     }
 
-
-
     await Pedido.update(
       {
         status: 3,
@@ -268,7 +266,6 @@ router.post("/venda/pedido/finalizar", Auth, async (req, res) => {
   }
 });
 
-
 // pagina ver todas as vendas finalizadas
 router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
   try {
@@ -300,10 +297,9 @@ router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
       order: [["data_venda", "DESC"]],
     });
 
-    return res.status(200).json({ venda_finalizada, clientes , pedidos });
-   
+    return res.status(200).json({ venda_finalizada, clientes, pedidos });
   } catch (error) {
-   return res.status(500).json({ error: "Erro ao buscar vendas" });
+    return res.status(500).json({ error: "Erro ao buscar vendas" });
   }
 });
 
@@ -311,7 +307,7 @@ router.get("/venda/vendas_finalizadas", Auth, async (req, res) => {
 router.post("/venda/vendas_finalizadas/buscar", Auth, async (req, res) => {
   try {
     const { data_inicial, data_final } = req.body;
-
+console.log(" Data enviada ",data_inicial, data_final)
     // Converter as datas para objetos Date
     const startDate = new Date(data_inicial);
     startDate.setUTCHours(0, 0, 0, 0); // Define a primeira hora do dia (00:00:00) em UTC
@@ -319,10 +315,10 @@ router.post("/venda/vendas_finalizadas/buscar", Auth, async (req, res) => {
     const endDate = new Date(data_final);
     endDate.setUTCHours(23, 59, 59, 999); // Define a última hora do dia (23:59:59.999) em UTC
 
-    const pedido = await Pedido.findAll({
+    const pedidos = await Pedido.findAll({
       where: { usuario: req.session.user.id },
     });
-    const cliente = await Cliente.findAll({
+    const clientes = await Cliente.findAll({
       where: { usuario: req.session.user.id },
     });
 
@@ -338,20 +334,16 @@ router.post("/venda/vendas_finalizadas/buscar", Auth, async (req, res) => {
       order: [["data_venda", "DESC"]],
     });
 
-    if (venda_finalizada.length > 0) {
-      res.render("venda/vendas_finalizadas", {
-        venda_finalizada,
-        moment,
-        pedido,
-        cliente,
-      });
-    } else {
-      req.flash("erro_msg", "Não foram encontradas vendas nesse período !");
-      res.redirect("/venda/vendas_finalizadas");
+    if (venda_finalizada.length <= 0) {
+      return res
+        .status(404)
+        .json({ error: "Nenhuma venda encontrada nessa data." });
     }
+   
+    return res.status(200).json({ venda_finalizada, clientes, pedidos });
+
   } catch (error) {
-    req.flash("erro_msg", "Erro ao carregar vendas!");
-    res.redirect("/");
+    return res.status(500).json({ error: "Erro ao buscar vendas" });
   }
 });
 
