@@ -575,7 +575,7 @@ router.post("/pedido/delet/cliente", Auth, async (req, res) => {
   }
 });
 
-// Recebendo os dados enviar a tela de imprimir orçamento
+// tela de imprimir orçamento para visualizar 
 router.get("/pedido/imprimir_ver/:id", Auth, async (req, res) => {
   const id = req.params.id;
   const userId = req.session.user.id;
@@ -610,7 +610,7 @@ router.get("/pedido/imprimir_ver/:id", Auth, async (req, res) => {
   }
 });
 
-// esse esta funcionando normal
+// tela de impresão de orçamento esta funcionando normal
 router.get("/pedido/imprimir/:id", Auth, async (req, res) => {
   const id = req.params.id;
   const userId = req.session.user.id;
