@@ -23,14 +23,13 @@ const secret = "kakdhkasjdkhajkdhkajsdhjkshdjkahskdh";
 // Rota de verificação da sessão
 router.get("/session-info", (req, res) => {
   if (req.session.user) {
-    // Se o usuário estiver logado, retorna as informações da sessão   
+    // Se o usuário estiver logado, retorna as informações da sessão
     res.status(200).json({ loggedIn: true, user: req.session.user });
- } else {
+  } else {
     // Se o usuário não estiver logado, retorna status não autorizado
     res.status(401).json({ loggedIn: false, user: null });
   }
 });
-
 
 // login
 router.post("/user/login", async (req, res) => {
@@ -61,10 +60,11 @@ router.post("/user/login", async (req, res) => {
             cargo: "vendedor",
           };
 
-
           // Retornar o token no corpo da resposta
           // return res.status(200).json({ message: "Login bem-sucedido", token, user: req.session.user });
-          return res.status(200).json({ message: "Login bem-sucedido",  user: req.session.user });
+          return res
+            .status(200)
+            .json({ message: "Login bem-sucedido", user: req.session.user });
           //res.json(req.session.user)
         } else {
           return res.json({
@@ -80,16 +80,13 @@ router.post("/user/login", async (req, res) => {
       }
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        mensagem: false,
-        message: "Erro ao logar",
-        error: error.message,
-      });
+    return res.status(500).json({
+      mensagem: false,
+      message: "Erro ao logar",
+      error: error.message,
+    });
   }
 });
-
 
 //  Criando User
 router.post("/user/new", async (req, res) => {
@@ -114,17 +111,18 @@ router.post("/user/new", async (req, res) => {
           email: email,
           senha: hash,
         }).then(() => {
-
           return res
             .status(200)
             .json({ message: "Cadastrado com sucesso. Faça login!" });
         });
       } else {
-        return   res.status(409).json({ message: "Por favor, insira um email válido." });
+        return res
+          .status(409)
+          .json({ message: "Por favor, insira um email válido." });
       }
     } else {
       if (vazio != 1) {
-        return   res.status(500).json({ message: "O email já está cadastrado." });
+        return res.status(500).json({ message: "O email já está cadastrado." });
       }
     }
   });
@@ -223,12 +221,12 @@ router.post("/user/recuperar-senha", async (req, res) => {
     const token = generateRandomToken();
 
     const smtp = nodemailer.createTransport({
-      host: "smtp-mail.outlook.com",
-      port: 587,
-      secure: false,
+      service: "gmail",
+      secure: true,
+      port: 465,
       auth: {
-        user: "eliel.silva.lider@hotmail.com",
-        pass: "eliza2018",
+        user: "suportedev37@gmail.com",
+        pass: "sdkx fcjo ejby wsel",
       },
     });
 
@@ -236,22 +234,27 @@ router.post("/user/recuperar-senha", async (req, res) => {
       from: "eliel.silva.lider@hotmail.com",
       to: email,
       subject: "Código de verificação ContruERP",
-      text:
-        "Segue sua senha provisória, mudar assim que entrar no sistema: \n" +
-        token,
-      html:
-        "<p>Segue sua senha provisória, mudar assim que entrar no sistema:</p>" +
-        token,
+      html: `<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<p>&nbsp;</p>
+<div>
+<div><em>Segue sua senha provis&oacute;ria, mudar assim que entrar no sistema:<strong>${token}</strong></em></div>
+</div>
+</body>
+</html>`,
     };
 
     smtp.sendMail(message, function (err) {
       if (err) {
-        // res.status(400).json({
-        //   error: true,
-        //   mensagem: "erro ao enviar email" + err
-        // })
-        req.flash("erro_msg_login", "Erro ao enviar e-mail.");
-        res.redirect("/user/login");
+        res.status(400).json({
+          error: true,
+          mensagem: "erro ao enviar email" + err,
+        });
+        // req.flash('erro_msg_login', 'Erro ao enviar e-mail.');
+        // res.redirect('/user/login');
       } else {
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(token, salt);
@@ -266,24 +269,19 @@ router.post("/user/recuperar-senha", async (req, res) => {
               where: { email: email },
             }
           );
-          req.flash(
-            "sucesso_msg_login",
-            "Sua nova senha foi enviada para seu email!"
-          );
-          res.redirect("/user/login");
+          return res
+            .status(200)
+            .json({ message: "Senha enviada com sucesso!" });
         } else {
-          req.flash("erro_msg_login", "Houve um erro ao enviar sua senha!");
-          res.redirect("/");
+          return res
+            .status(400)
+            .json({ error: true, message: "erro ao enviar email" });
         }
       }
     });
   } catch (error) {
     console.error(error);
-    req.flash(
-      "erro_msg_login",
-      "Ocorreu um erro ao processar sua solicitação."
-    );
-    res.redirect("/user/login");
+    return res.status(500).json({ error: "Erro ao processar a solicitação" });
   }
 });
 
