@@ -16,10 +16,11 @@
       .container {
         width: 70mm;
         padding: 5px;
-        margin-left: 1px; /* Garante alinhamento à esquerda */
+        margin-left: 1px;
+        /* Garante alinhamento à esquerda */
       }
 
-  
+
 
       .content {
         margin-bottom: 10px;
@@ -30,9 +31,15 @@
         margin-top: 10px;
       }
 
+      .logo {
+        text-align: center;
+        margin-top: 10px;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
+        margin-bottom: 10px;
       }
 
       th,
@@ -40,17 +47,40 @@
         /* border: 1px solid black; */
         padding: 5px;
         text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        /* Cor de fundo para o cabeçalho */
+        font-weight: bold;
       }
 
       .total-row td {
-        /* border-top: 2px solid black; */
+        border-top: 2px solid black;
+        /* Linha mais grossa no total */
         text-align: left;
+        font-weight: bold;
+        /* Total em negrito */
       }
     }
 
+
+    /* Impede que a tabela quebre entre as páginas */
+    table {
+      page-break-inside: avoid;
+    }
+
+    /* Impede que as linhas da tabela quebrem entre as páginas */
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+
     .container {
-        font-size: 14px;      
-      }
+      font-size: 12px;
+      margin-left: 5px;
+    }
   </style>
 
 </head>
@@ -58,105 +88,113 @@
 <body>
   <div class="container">
     <div class="header">
-      <h2>**VENDA FINALIZADA**</h2>
+      <div class="logo">
+        <img src="https://th.bing.com/th/id/OIP.vgTSgC1L4U37OuQdV7jdEwHaG_?w=1984&h=1871&rs=1&pid=ImgDetMain" style="height: 100px;width: 100px;" >
+        
+      </div>
+      
       <p>
         <strong style="font-size: 20px;">
-        -  <%= user.nome %>
+          <%= user.nome %>
         </strong></br>
-       - CNPJ: <strong>
+        <strong>
           <%= user.cnpj %>
         </strong> </br>
-       - Telefone: <strong>
+        <strong>
           <%= user.telefone %>
         </strong> </br>
-       - Endereço: <%= user.rua %>
+        <%= user.rua %>
           <%= user.bairro %>
-            <%= user.cidade %></br>
-             - <%= user.uf %>
+            </br>
+            <%= user.cidade %>
+              <%= user.uf %>
       </p>
     </div>
     <div class="content">
       <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
         <strong>Informações do Cliente:</strong>
-        </br
-          <strong>-Nome:</strong>
-          <%= cliente.nome %><br>
-            <strong>-Telefone:</strong>
-            <%= cliente.telefone %><br>
-              <strong>-Rua:</strong>
-              <%= cliente.rua %><br>
-                <strong>-Número:</strong>
-                <%= cliente.numero %><br>
-                  <strong>-CEP:</strong>
-                  <%= cliente.cep %><br>
-                    <strong>-Bairro:</strong>
-                    <%= cliente.bairro %><br>
-                      <strong>-Cidade:</strong>
-                      <%= cliente.cidade %> 
-                        <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
-      
-        <% } %>
-          <% if (typeof itemPedido !=='undefined' ) { %>
-            <table>
-              <thead>
-                <tr>
-                  <th>Produto</th>
-                  <!-- <th style="text-align: center;"> Medida</th> -->
-                  <th>QNT</th>
-                  <th>Valor</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% itemPedido.forEach(item=> { %>
-                  <tr>
-                    <td>
-                      <%= item.nome %>
-                    </td>
-                    <!-- <td style="text-align: center;">
+        </br>
+
+        <%= cliente.nome %><br>
+
+          <%= cliente.telefone %><br>
+
+            <%= cliente.rua %><br>
+
+              <%= cliente.numero %><br>
+
+                <%= cliente.cep %>
+
+                  <%= cliente.bairro %><br>
+
+                    <%= cliente.cidade %>
+                      <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
+
+                      <% } %>
+                        <% if (typeof itemPedido !=='undefined' ) { %>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Produto</th>
+                                <!-- <th style="text-align: center;"> Medida</th> -->
+                                <th>QNT</th>
+                                <th>Valor</th>
+                                <th>Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% itemPedido.forEach(item=> { %>
+                                <tr>
+                                  <td>
+                                    <%= item.nome %>
+                                  </td>
+                                  <!-- <td style="text-align: center;">
                       <%= item.undMedidas %>
                     </td> -->
-                    <td  >
-                      <%= item.quant_itens %>
-                    </td>
-                    <td>
-                      <%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); %>
-                    </td>
-                    <td >
-                      <%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %>
-                    </td>
-                  </tr>
-                  <% }) %>
-                    <tr class="total-row">
-                      <td colspan="3">Valor total do pedido:</td>
-                      <td  >
-                        <%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' })
-                          %>
-                      </td>
-                      </br></br></br>
-                    </tr>
-              </tbody>
-            </table>
+                                  <td>
+                                    <%= item.quant_itens %>
+                                  </td>
+                                  <td>
+                                    <%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); %>
+                                  </td>
+                                  <td>
+                                    <%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' ,
+                                      currency: 'BRL' }) %>
+                                  </td>
+                                </tr>
+                                <% }) %>
+                                  <tr class="total-row">
+                                    <td colspan="3">Valor total do pedido:</td>
+                                    <td>
+                                      <%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' ,
+                                        currency: 'BRL' }) %>
+                                    </td>
+                                    </br></br></br>
+                                  </tr>
+                            </tbody>
+                          </table>
 
-            <div class="header">
-              <p>   </br>
-               - Pago em: <strong>
-                  <%= venda.tipo_pagamento %>
-                </strong> </br>
-            
-              </p>
-            </div>
-            <!-- <div style="
+                          <div class="header">
+                            <p> </br>
+                              - Pago em: <strong>
+                                <%= venda.tipo_pagamento %>
+                              </strong> </br>
+
+                            </p>
+                          </div>
+                          <!-- <div style="
             background-color: blue;
             width: 48mm;
             ">dlsakldjlas</div> -->
-            <% } %>
+                          <% } %>
 
-          <div class="footer">
-            <br>
-            <p>Data de emissão: <%= new Date().toLocaleString() %></p>
-            <h6>Agradecemos a preferência.</h6>
-          </div>
+                            <div class="footer">
+                              <br>
+                              <h5>Venda finalizada</h5>
+                              <p>Data de emissão: <%= new Date().toLocaleString() %>
+                              </p>
+                              <h6>Agradecemos a preferência.</h6>
+                            </div>
     </div>
   </div>
 </body>

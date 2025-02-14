@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Orçamento</title>
+    <style>
+        @media print {
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                margin: 0;
+                padding: 1px;
+            }
+
+            .container {
+                width: 70mm;
+                padding: 5px;
+                margin-left: 1px;
+                /* Garante alinhamento à esquerda */
+            }
+
+
+            .content {
+                margin-bottom: 10px;
+            }
+
+            .footer {
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            th,
+            td {
+                /* border: 1px solid black; */
+                padding: 5px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+
+            .total-row td {
+                /* border-top: 2px solid black; */
+                text-align: left;
+            }
+        }
+
+        .container {
+            font-size: 14px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            /* width: 100px;  Ajuste o tamanho conforme necessário */
+            margin-bottom: 10px;
+        }
+
+        .company-info p {
+            margin: 5px 0;
+        }
+
+        .customer-info {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .customer-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .item-table th,
+        .item-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .item-table th {
+            background-color: #f9f9f9;
+        }
+
+        .total-row {
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer p {
+            margin: 2px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <!--  LOGO DA EMPRESA  -->
+            <div class="logo">
+            </div>
+            <!-- <img src="seu-logo.png" alt="Logo da Empresa" style="max-width: 150px;"> -->
+            <h2>**ORÇAMENTO**</h2>
+            <div class="company-info">
+                <p><strong style="font-size: 16px;">- <%= user.nome %></strong></p>
+                <p>- CNPJ: <strong><%= user.cnpj %></strong></p>
+                <p>- Telefone: <strong><%= user.telefone %></strong></p>
+                <p>- Endereço: <%= user.rua %> <%= user.bairro %> <%= user.cidade %> - <%= user.uf %></p>
+            </div>
+        </div>
+
+        <div class="content">
+            <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
+            <div class="customer-info">
+                <strong>Informações do Cliente:</strong>
+                <p><strong>-Nome:</strong> <%= cliente.nome %></p>
+                <p><strong>-Telefone:</strong> <%= cliente.telefone %></p>
+                <p><strong>-Rua:</strong> <%= cliente.rua %></p>
+                <p><strong>-Número:</strong> <%= cliente.numero %></p>
+                <p><strong>-CEP:</strong> <%= cliente.cep %></p>
+                <p><strong>-Bairro:</strong> <%= cliente.bairro %></p>
+                <p><strong>-Cidade:</strong> <%= cliente.cidade %></p>
+                <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
+            </div>
+            <% } %>
+
+            <% if (typeof itemPedido !=='undefined' ) { %>
+            <table class="item-table">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>QNT</th>
+                        <th>Valor</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% itemPedido.forEach(item=> { %>
+                    <tr>
+                        <td><%= item.nome %></td>
+                        <td><%= item.quant_itens %></td>
+                        <td><%= item.valor_unitario.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); %></td>
+                        <td><%= item.sub_total_itens.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %></td>
+                    </tr>
+                    <% }) %>
+                    <tr class="total-row">
+                        <td colspan="3">Valor total do pedido:</td>
+                        <td><%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' , currency: 'BRL' }) %></td>
+                    </tr>
+                </tbody>
+            </table>
+            <% } %>
+
+            <div class="footer">
+                <p>Data de emissão: <%= new Date().toLocaleDateString('pt-BR') %></p>
+                <p>Agradecemos a preferência.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
