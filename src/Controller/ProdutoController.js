@@ -49,36 +49,27 @@ router.get("/produto/estoque_baixo", Auth, async (req, res) => {
 ///   buscar produtos
 router.post("/produto/buscar", Auth, async (req, res) => {
   const { buscarProduto } = req.body;
-  // console.log(req.body)
-  // console.log(buscarProduto);
-  // UserID = req.session.user.id // Adiciona a condição para verificar o usuário logado
 
   try {
-    const produtos = await Produto.findAll({
-      where: {
-        nomeProduto: {
-          [Op.like]: `%${buscarProduto}%`,
-        },
-        usuario: req.session.user.id, // segundaverificação praverificar o id do usuario
-      },
-      // include: User.busca({ where: { id: req.session.user.id } }) // Inclui a referência ao modelo User na consulta
-    });
+      const produtos = await Produto.findAll({
+          where: {
+              nomeProduto: {
+                  [Op.like]: `%${buscarProduto}%`,
+              },
+              usuario: req.session.user.id,
+          },
+          limit: 20 // Limita a 20 produtos
+      });
 
-    return res.status(200).json({ produtos });
+      return res.status(200).json({ produtos });
 
-    //res.json(produtos)
   } catch (error) {
-    console.log(error);
-    const produtos = await Produto.findAll({
-      where: { usuario: req.session.user.id },
-    });
-    // const produtos = await Produto.findAll({ where: { id: req.session.user.id } });
-    return res.status(500).json({
-      produtos,
-      mensagem: false,
-      message: "Erro ao buscar produto",
-      error: error.message,
-    });
+      console.log(error);
+      return res.status(500).json({
+          mensagem: false,
+          message: "Erro ao buscar produto",
+          error: error.message,
+      });
   }
 });
 
