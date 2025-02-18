@@ -340,9 +340,12 @@ router.post("/pedido/editar/quant", Auth, async (req, res) => {
   try {
     const id = req.body.id;
     const IDpedido = req.body.IDpedido;
-    const quant = req.body.quant.replace(/(\.|,)/g, (match, p1) =>
-      p1 === "." ? "" : "."
-    );
+
+      const quant = req.body.quant
+ 
+    // const quant = req.body.quant.replace(/(\.|,)/g, (match, p1) =>
+    //   p1 === "." ? "" : "."
+    // );
     // const valor_compra = req.body.valor_compra.replace(/(\.|,)/g, (match, p1) =>
     //   p1 === "." ? "" : "."
     // );
