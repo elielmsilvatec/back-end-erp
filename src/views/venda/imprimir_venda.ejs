@@ -8,73 +8,110 @@
     @media print {
       body {
         font-family: Arial, sans-serif;
-        font-size: 10px;
+        font-size: 9px;
         margin: 0;
-        padding: 1px;
+        padding: 2px;
+        line-height: 1.0;
       }
 
       .container {
         width: 70mm;
-        padding: 5px;
+        padding: 3px;
         margin-left: 1px;
-        /* Garante alinhamento à esquerda */
       }
 
-
+      .header {
+        page-break-after: avoid; /* Impede a quebra após o cabeçalho */
+      }
 
       .content {
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+        page-break-before: avoid; /* Impede a quebra antes do conteúdo */
       }
 
       .footer {
         text-align: center;
-        margin-top: 10px;
+        margin-top: 5px;
       }
 
       .logo {
         text-align: center;
-        margin-top: 10px;
+        margin-top: 5px;
+      }
+
+      .logo img {
+        height: 70px; /* Reduzindo ainda mais o tamanho do logo */
+        width: 70px;
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+        page-break-inside: avoid;
       }
 
       th,
       td {
-        /* border: 1px solid black; */
-        padding: 5px;
+        padding: 3px;
         text-align: left;
         border-bottom: 1px solid #ddd;
       }
 
       th {
         background-color: #f2f2f2;
-        /* Cor de fundo para o cabeçalho */
         font-weight: bold;
       }
 
       .total-row td {
         border-top: 2px solid black;
-        /* Linha mais grossa no total */
         text-align: left;
         font-weight: bold;
-        /* Total em negrito */
       }
-    }
 
+      table td:nth-child(3),
+      table td:nth-child(4) {
+        text-align: right;
+      }
 
-    /* Impede que a tabela quebre entre as páginas */
-    table {
-      page-break-inside: avoid;
-    }
+      table td:nth-child(2) {
+        padding-right: 5px;
+        text-align: center; /* Centraliza a quantidade */
+      }
 
-    /* Impede que as linhas da tabela quebrem entre as páginas */
-    tr {
-      page-break-inside: avoid;
-      page-break-after: auto;
+      tr {
+        page-break-inside: avoid;
+        page-break-before: auto;
+        page-break-after: auto;
+      }
+
+      /* Larguras de coluna ajustadas */
+      table td:nth-child(1) {
+        width: 45%;  /* Aumentei um pouco para o nome do produto */
+        word-break: break-word; /* Quebra palavras longas */
+      }
+      table th:nth-child(1) {
+          width: 45%;
+      }
+      table td:nth-child(2) {
+        width: 15%; /* Reduzi para a quantidade */
+      }
+       table th:nth-child(2) {
+          width: 15%;
+      }
+
+      table td:nth-child(3) {
+        width: 20%; /* Valor unitário */
+      }
+       table th:nth-child(3) {
+          width: 20%;
+      }
+      table td:nth-child(4) {
+        width: 20%; /* Total */
+      }
+       table th:nth-child(4) {
+          width: 20%;
+      }
     }
 
     .container {
@@ -82,19 +119,17 @@
       margin-left: 5px;
     }
   </style>
-
 </head>
 
 <body>
   <div class="container">
     <div class="header">
       <div class="logo">
-        <img src="https://th.bing.com/th/id/OIP.vgTSgC1L4U37OuQdV7jdEwHaG_?w=1984&h=1871&rs=1&pid=ImgDetMain" style="height: 100px;width: 100px;" >
-        
+        <img src="https://th.bing.com/th/id/OIP.vgTSgC1L4U37OuQdV7jdEwHaG_?w=1984&h=1871&rs=1&pid=ImgDetMain"
+          style="height: 70px; width: 70px;">
       </div>
-      
       <p>
-        <strong style="font-size: 20px;">
+        <strong style="font-size: 18px;">
           <%= user.nome %>
         </strong></br>
         <strong>
@@ -114,29 +149,19 @@
       <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
         <strong>Informações do Cliente:</strong>
         </br>
-
         <%= cliente.nome %><br>
-
           <%= cliente.telefone %><br>
-
             <%= cliente.rua %><br>
-
               <%= cliente.numero %><br>
-
                 <%= cliente.cep %>
-
                   <%= cliente.bairro %><br>
-
                     <%= cliente.cidade %>
-                      <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
-
                       <% } %>
                         <% if (typeof itemPedido !=='undefined' ) { %>
                           <table>
                             <thead>
                               <tr>
                                 <th>Produto</th>
-                                <!-- <th style="text-align: center;"> Medida</th> -->
                                 <th>QNT</th>
                                 <th>Valor</th>
                                 <th>Total</th>
@@ -148,10 +173,7 @@
                                   <td>
                                     <%= item.nome %>
                                   </td>
-                                  <!-- <td style="text-align: center;">
-                      <%= item.undMedidas %>
-                    </td> -->
-                                  <td>
+                                  <td style="text-align: center;">
                                     <%= item.quant_itens %>
                                   </td>
                                   <td>
@@ -169,29 +191,20 @@
                                       <%= pedido.valor_total_pedido.toLocaleString('pt-BR', { style: 'currency' ,
                                         currency: 'BRL' }) %>
                                     </td>
-                                    </br></br></br>
                                   </tr>
                             </tbody>
                           </table>
 
-                          <div class="header">
-                            <p> </br>
-                              - Pago em: <strong>
-                                <%= venda.tipo_pagamento %>
-                              </strong> </br>
+                          <p>
+                            - Pago em: <strong>
+                              <%= venda.tipo_pagamento %>
+                            </strong>
+                          </p>
 
-                            </p>
-                          </div>
-                          <!-- <div style="
-            background-color: blue;
-            width: 48mm;
-            ">dlsakldjlas</div> -->
                           <% } %>
-
                             <div class="footer">
                               <br>
                               <h5>Venda finalizada</h5>
-                              <!-- atualizado para pt-br -->
                               <p>Data de emissão: <%= new Date().toLocaleDateString('pt-BR') %>
                               </p>
                               <h6>Agradecemos a preferência.</h6>

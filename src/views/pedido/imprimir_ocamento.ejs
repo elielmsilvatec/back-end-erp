@@ -8,82 +8,80 @@
     @media print {
       body {
         font-family: Arial, sans-serif;
-        font-size: 10px;
+        font-size: 9px; /* Reduzi o tamanho da fonte */
         margin: 0;
         padding: 1px;
+        line-height: 1.0; /* Reduzi o espaçamento entre linhas */
       }
 
       .container {
         width: 70mm;
-        padding: 5px;
+        padding: 3px; /* Reduzi o padding */
         margin-left: 1px;
-        /* Garante alinhamento à esquerda */
+      }
+
+      .header {
+        page-break-after: avoid; /* Evita quebra após o cabeçalho */
       }
 
       .content {
-        margin-bottom: 10px;
+        margin-bottom: 5px; /* Reduzi a margem */
+        page-break-before: avoid; /* Evita quebra antes do conteúdo */
       }
 
       .footer {
         text-align: center;
-        margin-top: 10px;
+        margin-top: 5px; /* Reduzi a margem */
       }
 
       .logo {
         text-align: center;
-        margin-top: 10px;
+        margin-top: 5px; /* Reduzi a margem */
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 10px;
-        /* Adiciona espaço abaixo da tabela */
+        margin-bottom: 5px; /* Reduzi a margem */
+        page-break-inside: avoid; /* Impede que a tabela quebre */
       }
 
       th,
       td {
-        padding: 5px;
+        padding: 3px; /* Reduzi o padding */
         text-align: left;
         border-bottom: 1px solid #ddd;
-        /* Linhas horizontais sutis */
       }
 
       th {
         background-color: #f2f2f2;
-        /* Cor de fundo para o cabeçalho */
         font-weight: bold;
       }
 
       .total-row td {
         border-top: 2px solid black;
-        /* Linha mais grossa no total */
         text-align: left;
         font-weight: bold;
-        /* Total em negrito */
       }
 
-      /* Alinha os valores das colunas QNT, Valor e Total à direita */
       table td:nth-child(3),
       table td:nth-child(4) {
         text-align: right;
       }
 
-      /* Adiciona espaço extra à direita da coluna QNT */
       table td:nth-child(2) {
-        padding-right: 10px;
+        padding-right: 5px; /* Reduzi o padding */
       }
 
-
-      /* Impede que a tabela quebre entre as páginas */
-      table {
-        page-break-inside: avoid;
-      }
-
-      /* Impede que as linhas da tabela quebrem entre as páginas */
       tr {
         page-break-inside: avoid;
+        page-break-before: auto;
         page-break-after: auto;
+      }
+
+      table td:nth-child(1) {
+        width: 40%; /* Ajustei a largura da coluna */
+        word-break: break-word;
       }
     }
 
@@ -97,15 +95,12 @@
 <body>
   <div class="container">
     <div class="header">
-
       <div class="logo">
         <h2>ORÇAMENTO</h2>
-        <img src="https://th.bing.com/th/id/OIP.vgTSgC1L4U37OuQdV7jdEwHaG_?w=1984&h=1871&rs=1&pid=ImgDetMain" style="height: 100px;width: 100px;" >
-        
+        <img src="https://th.bing.com/th/id/OIP.vgTSgC1L4U37OuQdV7jdEwHaG_?w=1984&h=1871&rs=1&pid=ImgDetMain" style="height: 80px;width: 80px;" >
       </div>
-
       <p>
-        <strong style="font-size: 20px;">
+        <strong style="font-size: 18px;">
           <%= user.nome %>
         </strong></br>
         <strong>
@@ -125,22 +120,13 @@
       <% if (typeof cliente !=='undefined' && cliente !==null && cliente !=='' ) { %>
         <strong>Informações do Cliente:</strong>
         </br>
-
         <%= cliente.nome %><br>
-
           <%= cliente.telefone %><br>
-
             <%= cliente.rua %><br>
-
               <%= cliente.numero %><br>
-
                 <%= cliente.cep %><br>
-
                   <%= cliente.bairro %><br>
-
                     <%= cliente.cidade %>
-                      <!-- <strong>Observações:</strong> <%= cliente.observacoes %> -->
-
                       <% } %>
                         <% if (typeof itemPedido !=='undefined' ) { %>
                           <table>
