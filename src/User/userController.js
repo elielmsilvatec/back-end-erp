@@ -225,13 +225,13 @@ router.post("/user/recuperar-senha", async (req, res) => {
       secure: true,
       port: 465,
       auth: {
-        user: "suportedev37@gmail.com",
-        pass: "sdkx fcjo ejby wsel",
+        user:  process.env.EMAIL,
+        pass:  process.env.PASSWORD
       },
     });
 
     var message = {
-      from: "eliel.silva.lider@hotmail.com",
+      from: process.env.EMAIL,
       to: email,
       subject: "Código de verificação ContruERP",
       html: `<!DOCTYPE html>
