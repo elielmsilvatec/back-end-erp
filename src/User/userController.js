@@ -307,11 +307,13 @@ router.post("/user/nova-senha", Auth, async (req, res) => {
           where: { id: req.session.user.id },
         }
       );
-      req.flash("sucesso_msg", "Sua nova senha foi atualizada!");
-      res.redirect("/user/perfil");
+      // req.flash("sucesso_msg", "Sua nova senha foi atualizada!");
+      // res.redirect("/user/perfil");
+      return res.status(200).json({ message: "Sua nova senha foi atualizada!" });
     } else {
-      req.flash("erro_msg", "Erro ao atualizar senha!");
-      res.redirect("/user/perfil");
+      // req.flash("erro_msg", "Erro ao atualizar senha!");
+      // res.redirect("/user/perfil");
+      return res.status(400).json({ error: "Erro ao atualizar senha!" });
     }
   } catch (error) {
     return res.status(500).json({ error: "Erro..." });

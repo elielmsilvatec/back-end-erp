@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router();
 const Venda = require("../Model/VendaModel")
 const { Op, where } = require('sequelize');
@@ -22,15 +22,14 @@ router.get('/entrega/entregas', Auth, async (req, res) => {
       order: [['data_entrega', 'ASC']] // Ordena os resultados por data_entrega em ordem crescente
     });
 
-    res.render("entrega/entregas", {
+    return res.status(200).json({
       venda_finalizada,
-      moment,
       pedido,
       cliente
-    })
+    });
   } catch (error) {
-    req.flash('erro_msg', 'Erro ao carregar vendas!')
-    res.redirect('/')
+    console.error("Erro ao carregar entregas:", error);
+    return res.status(500).json({ error: 'Erro ao carregar vendas!' });
   }
 });
 
@@ -48,24 +47,21 @@ router.get('/entrega/ver/:id', Auth, async (req, res) => {
     ]);
     if (!pedido) {
       // Caso o pedido não seja encontrado, retorna um erro 404
-      return res.status(404).render("404");
+      return res.status(404).json({ error: 'Pedido não encontrado' });
     }
 
     const cliente = await Cliente.findOne({ where: { id: pedido.cliente_pedido, usuario: req.session.user.id } });
     const venda = await Venda.findOne({ where: { id_pedido: pedido.id, usuario: req.session.user.id } })
 
-    // Renderiza a página e passa as informações do pedido e dos produtos como variáveis para a view
-    res.render("entrega/ver_entrega", {
+    return res.status(200).json({
       pedido,
-      id,
       itemPedido,
       cliente,
-      venda,
-      moment
+      venda
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Erro ao buscar entrega' }); req.flash('erro_msg', 'Erro ao carregar entrega!')
-    res.redirect('/')
+    console.error("Erro ao buscar entrega:", error);
+    return res.status(500).json({ error: 'Erro ao buscar entrega' });
   }
 });
 
@@ -84,7 +80,7 @@ router.post('/entrega/obs', Auth, async (req, res) => {
     ]);
     if (!pedido) {
       // Caso o pedido não seja encontrado, retorna um erro 404
-      return res.status(404).render("404");
+      return res.status(404).json({ error: 'Pedido não encontrado' });
     }
 
     // atualiza obs de vendas 
@@ -96,24 +92,11 @@ router.post('/entrega/obs', Auth, async (req, res) => {
       { where: { id_pedido: pedido.id, usuario: req.session.user.id } }
     )
 
-    // const cliente = await Cliente.findOne({ where: { id: pedido.cliente_pedido, usuario: req.session.user.id } });
-    // const venda = await Venda.findOne({ where: { id_pedido: pedido.id, usuario: req.session.user.id } })
-
-    req.flash('sucesso_msg', 'Entrega atualizada com sucesso!')
-    // Renderiza a página e passa as informações do pedido e dos produtos como variáveis para a view
-    // res.render("entrega/ver_entrega", {
-    //   pedido,
-    //   id,
-    //   itemPedido,
-    //   cliente,
-    //   venda,
-    //   moment 
-    // });
-    res.redirect('/entrega/entregas')
+    return res.status(200).json({ message: 'Entrega atualizada com sucesso!' });
 
   } catch (error) {
-    return res.status(500).json({ error: 'Erro ao buscar entrega' }); req.flash('erro_msg', 'Erro ao carregar entrega!')
-    res.redirect('/')
+    console.error("Erro ao atualizar observação da entrega:", error);
+    return res.status(500).json({ error: 'Erro ao atualizar observação da entrega' });
   }
 });
 
@@ -122,8 +105,6 @@ router.post('/entrega/entregue', Auth, async (req, res) => {
   try {
     const venda_id = req.body.id_venda
     console.log(venda_id)
-    const pedido = await Pedido.findAll({ where: { usuario: req.session.user.id } })
-    const cliente = await Cliente.findAll({ where: { usuario: req.session.user.id } })
     // atualiza obs de vendas 
     await Venda.update(
       {
@@ -132,44 +113,29 @@ router.post('/entrega/entregue', Auth, async (req, res) => {
       { where: { id: venda_id, usuario: req.session.user.id } }
     )
 
-    const venda_finalizada = await Venda.findAll({ where: { entrega: 1, usuario: req.session.user.id } });
-
-
-    res.render("entrega/entregas", {
-      venda_finalizada,
-      moment,
-      pedido,
-      cliente
-    })
+    return res.status(200).json({ message: 'Status da entrega atualizado para entregue!' });
 
   } catch (error) {
-    req.flash('erro_msg', 'Erro ao carregar entregas!')
-    res.redirect('/')
+    console.error("Erro ao mudar status para entregue:", error);
+    return res.status(500).json({ error: 'Erro ao mudar status para entregue!' });
   }
 });
 
 // entregas já entregue
 router.get('/entrega/entregue', Auth, async (req, res) => {
   try {
-    const pedido = await Pedido.findAll({ where: { usuario: req.session.user.id } })
-    const cliente = await Cliente.findAll({ where: { usuario: req.session.user.id } })
 
     const venda_finalizada = await Venda.findAll({ where: { entrega: 2, usuario: req.session.user.id } });
-    res.render("entrega/entregue", {
-      venda_finalizada,
-      moment,
-      pedido,
-      cliente
-    })
+
+    return res.status(200).json({ venda_finalizada });
   } catch (error) {
-    req.flash('erro_msg', 'Erro ao carregar vendas!')
-    res.redirect('/')
+    console.error("Erro ao carregar entregas finalizadas:", error);
+    return res.status(500).json({ error: 'Erro ao carregar entregas finalizadas!' });
   }
 });
 
 ///  buscando cliente 
 router.post('/entrega/buscar/cliente', Auth, async (req, res) => {
-  // const { busca } = req.body;
   const busca = req.body.busca
   const id = req.body.id_pedido
 
@@ -188,34 +154,24 @@ router.post('/entrega/buscar/cliente', Auth, async (req, res) => {
     const [pedido] = await Promise.all([
       Pedido.findOne({ where: { id } }),
     ]);
+    if (!pedido) {
+      return res.status(404).json({ error: 'Pedido não encontrado' });
+    }
 
     const venda = await Venda.findOne({ where: { id_pedido: pedido.id, usuario: req.session.user.id } })
 
     if (clientes.length > 0) {    // Verifica se algum produto foi encontdora
-      res.render("entrega/ver_entrega", {
+      return res.status(200).json({
         clientes,
         pedido,
-        moment,
         venda
-
-      })
+      });
     } else {
-      const erro_msg = "Cliente não encontrado!"
-      res.render("entrega/ver_entrega", {
-        pedido,
-        erro_msg,
-        moment,
-        venda
-      })
+      return res.status(404).json({ message: "Cliente não encontrado!" });
     }
   } catch (error) {
-    res.send("Erro cath")
-    const pedido = Pedido.findOne({ where: { id } })
-    const erro_msg = "Erro ao buscar cliente!"
-    res.render("entrega/entregas", {
-      pedido,
-      erro_msg
-    })
+    console.error("Erro ao buscar cliente:", error);
+    return res.status(500).json({ error: "Erro ao buscar cliente!" });
   }
 });
 
@@ -226,33 +182,25 @@ router.post('/entrega/cliente/add_novo', Auth, async (req, res) => {
 
     const pedido = await Pedido.findOne({ where: { id: id_pedido, usuario: req.session.user.id } });
 
-    if (pedido) {
-      // Verifica se o pedido já possui um cliente associado
-      if (pedido.cliente_pedido) {
-        // Se já tiver um cliente, faz o upgrade do cliente
-        await pedido.update({ cliente_pedido: id_cliente });
-      } else {
-        // Se não tiver um cliente, insere o novo cliente
-        await pedido.update({ cliente_pedido: id_cliente });
-      }
+    if (!pedido) {
+      return res.status(404).json({ error: 'Pedido não encontrado' });
     }
-    const cliente = await Cliente.findOne({ where: { id: pedido.cliente_pedido, usuario: req.session.user.id } });
-    const itemPedido = await ItemPedido.findAll({ where: { pedido: id_pedido, usuario: req.session.user.id } })
-    const venda = await Venda.findOne({ where: { id_pedido: pedido.id, usuario: req.session.user.id } })
 
-    res.render("entrega/ver_entrega", {
-      pedido,
-      itemPedido,
-      cliente,
-      moment,
-      venda
-    });
+    // Verifica se o pedido já possui um cliente associado
+    if (pedido.cliente_pedido) {
+      // Se já tiver um cliente, faz o upgrade do cliente
+      await pedido.update({ cliente_pedido: id_cliente });
+    } else {
+      // Se não tiver um cliente, insere o novo cliente
+      await pedido.update({ cliente_pedido: id_cliente });
+    }
+
+    return res.status(200).json({ message: "Cliente adicionado ao pedido com sucesso!" });
 
   } catch (error) {
-    res.send("Erro ao tentar adicionar cliente ao pedido!")
+    console.error("Erro ao adicionar cliente ao pedido:", error);
+    return res.status(500).json({ error: "Erro ao tentar adicionar cliente ao pedido!" });
   }
 });
 
 module.exports = router;
-
-
